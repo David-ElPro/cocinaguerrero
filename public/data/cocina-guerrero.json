@@ -1,0 +1,230 @@
+{
+  "nombre": "Cocina Guerrero",
+  "eslogan": "Sabor casero con el auténtico sazón mexicano",
+  "colorPrimario": "#DC2626",
+  "colorAcento": "#EAB308",
+  "whatsapp": "527775579567",
+  "telefonoSecundario": "527773124589",
+  "googleBusiness": "https://share.google/GLDMJPWcsy5LIU7YB",
+  "mercadoPago": "https://link.mercadopago.com.mx/testing11",
+  "logo": "../logo.png",
+  "horario": "Lun - Vie: 9:00 AM - 5:00 PM",
+  "direccion": "Cuernavaca / Jiutepec, Morelos",
+  "mision": "Ofrecer a nuestros clientes alimentos caseros de la más alta calidad, preparados al momento con ingredientes frescos y el auténtico sazón mexicano.",
+  "vision": "Ser la cocina económica de referencia en la región, destacando por nuestro sabor, higiene, rapidez en entregas y servicio cálido.",
+  "videoUrl": "https://www.youtube.com/embed/caNe5H_WR5k",
+  "redes": {
+    "facebook": "https://facebook.com",
+    "instagram": "https://instagram.com",
+    "twitter": "https://x.com"
+  },
+  "carousel": [
+    "./img/milanesadepollo.png",
+    "./img/pancita.png",
+    "./img/pozole.png"
+  ],
+  "categorias": [
+    {
+      "titulo": "Guisados de Cajón",
+      "nota": "Todos incluyen: Sopa del día, agua de sabor, arroz, frijoles y ensalada.",
+      "items": [
+        {
+          "nombre": "Milanesa de Pollo",
+          "descripcion": "Crujiente milanesa acompañada de arroz, frijoles, ensalada, sopa del día y agua.",
+          "precio": "$90.00",
+          "badge": "De Cajón",
+          "imagen": "./img/milanesadepollo.png"
+        },
+        {
+          "nombre": "Tortas de Papa",
+          "descripcion": "A elegir: secas o en caldillo de jitomate. Incluye arroz, frijoles, ensalada, sopa y agua.",
+          "precio": "$85.00",
+          "badge": "Casero",
+          "imagen": "./img/tortasdepapa.png"
+        },
+        {
+          "nombre": "Bisteck de Puerco Encebollado",
+          "descripcion": "Jugoso bisteck asado con cebolla acitronada + arroz, frijoles, ensalada, sopa y agua.",
+          "precio": "$90.00",
+          "badge": "",
+          "imagen": "./img/bisteckdepuercoencebollado.png"
+        },
+        {
+          "nombre": "Carne Enchilada",
+          "descripcion": "Carne de puerco marinada en adobo tradicional con sus complementos completos.",
+          "precio": "$90.00",
+          "badge": "Popular",
+          "imagen": "./img/carneenchilada.png"
+        },
+        {
+          "nombre": "Pechuga Asada",
+          "descripcion": "Pechuga a la plancha baja en grasa con arroz, frijoles, ensalada, sopa y agua.",
+          "precio": "$90.00",
+          "badge": "Saludable",
+          "imagen": "./img/pechugaasada.png"
+        }
+      ]
+    },
+    {
+      "titulo": "Especialidades de Cajón",
+      "nota": "Incluyen: Sopa del día, agua de sabor, arroz y frijoles.",
+      "items": [
+        {
+          "nombre": "Enchiladas Verdes",
+          "descripcion": "Rellenas a elegir: Tinga de pollo o Queso fresco. Con crema y queso rallado.",
+          "precio": "$90.00",
+          "badge": "Recomendado",
+          "imagen": "./img/enchiladas.png"
+        },
+        {
+          "nombre": "Enmoladas Tradicionales",
+          "descripcion": "Bañadas en mole casero, rellenas de tinga de pollo o queso.",
+          "precio": "$90.00",
+          "badge": "Sazón Casero",
+          "imagen": "./img/enmoladas.png"
+        },
+        {
+          "nombre": "Chilaquiles",
+          "descripcion": "Servidos con arroz y frijoles. A elegir: 2 huevos estrellados o pollo deshebrado.",
+          "precio": "$90.00",
+          "badge": "Top Ventas",
+          "imagen": "./img/chilaquilesconhuevo.png"
+        },
+        {
+          "nombre": "Hígado Encebollado",
+          "descripcion": "Suave hígado de res salteado con abundante cebolla + arroz, frijoles, sopa y agua.",
+          "precio": "$90.00",
+          "badge": "",
+          "imagen": "./img/higadoencebollado.png"
+        }
+      ]
+    },
+    {
+      "titulo": "Especiales por Día",
+      "nota": "Disponibles únicamente en su día correspondiente.",
+      "items": [
+        {
+          "nombre": "Barbacoa de Res (Solo Miércoles)",
+          "descripcion": "Estilo guisado tradicional. Incluye sopa del día y 1 Litro de agua de sabor.",
+          "precio": "$95.00",
+          "badge": "Miércoles",
+          "imagen": "./img/barbacoaderes.png"
+        },
+        {
+          "nombre": "Pozole de Pollo o Puerco (Solo Jueves)",
+          "descripcion": "Incluye orden de tacos dorados (preparados o solos) y 1 Litro de agua de sabor.",
+          "precio": "$100.00",
+          "badge": "Jueves",
+          "imagen": "./img/pozole.png"
+        },
+        {
+          "nombre": "Pancita de Res (Solo Viernes)",
+          "descripcion": "Platillo tradicional servido bien caliente. No incluye bebida.",
+          "precio": "$120.00",
+          "badge": "Viernes",
+          "imagen": "./img/pancita.png"
+        }
+      ]
+    },
+    {
+      "titulo": "Platillos a la Carta",
+      "nota": "Todos incluyen: Sopa del día, agua de sabor, arroz, frijoles y ensalada.",
+      "items": [
+        {
+          "nombre": "Mojarra Frita con Papas",
+          "descripcion": "Mojarra entera bien doradita servida con papas a la francesa y complementos.",
+          "precio": "$180.00",
+          "badge": "Premium",
+          "imagen": "./img/mojarra.png"
+        },
+        {
+          "nombre": "Arrachera Asada",
+          "descripcion": "Corte de arrachera jugosa con arroz, frijoles, ensalada, sopa del día y agua.",
+          "precio": "$150.00",
+          "badge": "Especialidad",
+          "imagen": "./img/arrachera.png"
+        },
+        {
+          "nombre": "Cecina Tradicional",
+          "descripcion": "Auténtica cecina servida con guarnición completa.",
+          "precio": "$150.00",
+          "badge": "Regional",
+          "imagen": "./img/cecina.png"
+        },
+        {
+          "nombre": "Filete de Pescado Empanizado",
+          "descripcion": "Filete crujiente de pescado con arroz, frijoles, ensalada, sopa y agua.",
+          "precio": "$100.00",
+          "badge": "",
+          "imagen": "./img/filetedepescadoempanizado.png"
+        }
+      ]
+    },
+    {
+      "titulo": "Antojitos y Garnachas",
+      "items": [
+        {
+          "nombre": "Quesadillas Sencillas",
+          "descripcion": "Rellenas de Pollo o Queso fundido.",
+          "precio": "$25.00",
+          "badge": "Favorito",
+          "imagen": "./img/quesadilla.png"
+        },
+        {
+          "nombre": "Quesadillas Combinadas",
+          "descripcion": "Preparadas con 2 ingredientes a tu elección.",
+          "precio": "$30.00",
+          "badge": "Especial",
+          "imagen": "./img/quesadillacombinada.png"
+        },
+        {
+          "nombre": "Gorditas Caseras",
+          "descripcion": "De Chales (chicharrón prensado), frijol o requesón con pollo encima.",
+          "precio": "$25.00",
+          "badge": "Tradicional",
+          "imagen": "./img/gordita.png"
+        },
+        {
+          "nombre": "Orden de Tacos Dorados",
+          "descripcion": "Orden de tacos dorados sencillos (puros tacos).",
+          "precio": "$30.00",
+          "badge": "",
+          "imagen": "./img/tacosdorados.png"
+        },
+        {
+          "nombre": "Papas a la Francesa",
+          "descripcion": "Orden individual de papas fritas sazonadas.",
+          "precio": "$50.00",
+          "badge": "Botana",
+          "imagen": "./img/papasalafrancesa.png"
+        }
+      ]
+    },
+    {
+      "titulo": "Postres Caseros",
+      "items": [
+        {
+          "nombre": "Plátanos Fritos con Lechera",
+          "descripcion": "Plátano macho frito servido con leche condensada.",
+          "precio": "$25.00",
+          "badge": "Dulce",
+          "imagen": "./img/platanosfritos.png"
+        },
+        {
+          "nombre": "Flan de Leche",
+          "descripcion": "Flan de leche en vaso.",
+          "precio": "$20.00",
+          "badge": "Postre",
+          "imagen": "./img/flanes.png"
+        },
+        {
+          "nombre": "Gelatinas",
+          "descripcion": "Gelatina individual de diversos sabores.",
+          "precio": "$20.00",
+          "badge": "",
+          "imagen": "./img/gelatina.jpg"
+        }
+      ]
+    }
+  ]
+}

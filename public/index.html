@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cocina Guerrero | Menú Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div id="app" style="display: none;">
+    <!-- Navbar / Header -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#inicio" class="brand">
+                <img id="client-logo" src="../logo.png" alt="Cocina Guerrero">
+                <div>
+                    <h2 id="client-title">Cocina Guerrero</h2>
+                    <span id="client-schedule" class="status-badge"><i class="fa-solid fa-clock"></i> Cargando...</span>
+                </div>
+            </a>
+
+            <!-- Menu Links -->
+            <div class="nav-menu" id="nav-menu">
+                <a href="#inicio" class="nav-link"><i class="fa-solid fa-house"></i> Inicio</a>
+                <a href="#menu-section" class="nav-link"><i class="fa-solid fa-utensils"></i> Menú</a>
+                <a href="#nosotros" class="nav-link"><i class="fa-solid fa-users"></i> Nosotros</a>
+                <a href="#testimonios" class="nav-link"><i class="fa-solid fa-star"></i> Opiniones</a>
+                <a href="#ubicacion" class="nav-link"><i class="fa-solid fa-location-dot"></i> Ubicación</a>
+            </div>
+
+            <div class="nav-actions">
+                <a id="gmb-link" href="#" target="_blank" class="gmb-btn"><i class="fa-solid fa-map-pin"></i> Google Maps</a>
+                <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero" id="inicio">
+        <div class="carousel-bg" id="carousel-bg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span class="hero-tag"><i class="fa-solid fa-pepper-hot"></i> Sazón 100% Mexicano</span>
+            <h1 id="hero-title">Cocina Guerrero</h1>
+            <p id="client-subtitle"></p>
+
+            <div class="hero-actions">
+                <a href="#menu-section" class="btn btn-primary"><i class="fa-solid fa-book-open"></i> Ver Menú</a>
+                <a id="btn-hero-wa" href="#" target="_blank" class="btn btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> Ordenar por WhatsApp</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Banner Menú del Día -->
+    <section class="daily-banner container">
+        <div class="banner-card">
+            <div class="banner-icon"><i class="fa-solid fa-bell"></i></div>
+            <div class="banner-text">
+                <h3>¿Quieres saber los guisados especiales de hoy?</h3>
+                <p>Nuestro menú cambia diariamente. ¡Escríbenos para enviarte la lista del día!</p>
+            </div>
+            <a id="btn-daily-wa" href="#" target="_blank" class="banner-btn"><i class="fa-brands fa-whatsapp"></i> Consultar Guisados del Día</a>
+        </div>
+    </section>
+
+    <!-- Catálogo de Productos -->
+    <main class="container" id="menu-section">
+        <div id="catalog-container"></div>
+    </main>
+
+    <!-- Sección Misión y Visión -->
+    <section class="container nosotros-section" id="nosotros">
+        <h3 class="section-title"><i class="fa-solid fa-bullseye"></i> Sobre Nosotros</h3>
+        <div class="nosotros-grid">
+            <div class="nosotros-card">
+                <div class="card-icon-header"><i class="fa-solid fa-heart"></i></div>
+                <h4>Nuestra Misión</h4>
+                <p id="txt-mision">Cargando misión...</p>
+            </div>
+            <div class="nosotros-card">
+                <div class="card-icon-header"><i class="fa-solid fa-eye"></i></div>
+                <h4>Nuestra Visión</h4>
+                <p id="txt-vision">Cargando visión...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Video Promocional -->
+    <section class="container video-section" id="video">
+        <h3 class="section-title"><i class="fa-solid fa-circle-play"></i> Conoce Nuestra Cocina</h3>
+        <div class="video-container">
+            <iframe id="promo-video" src="" title="Video Promocional Cocina Guerrero" allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <!-- Testimonios Carrusel -->
+    <section class="container testimonials-section" id="testimonios">
+        <div class="testimonials-header">
+            <h3 class="section-title"><i class="fa-solid fa-comments"></i> Lo que dicen nuestros clientes</h3>
+            <div class="carousel-controls">
+                <button id="prev-testi" class="ctrl-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                <button id="next-testi" class="ctrl-btn"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+        </div>
+
+        <div class="testi-carousel-wrapper">
+            <div class="testi-track" id="testi-track">
+                <!-- Renderizado dinámicamente con 6 testimonios -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Full Width -->
+    <footer id="ubicacion">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <!-- Col 1: Nombre & Mercado Pago -->
+                <div class="footer-col">
+                    <h4 class="footer-brand">Cocina Guerrero</h4>
+                    <p id="footer-slogan" class="footer-slogan"></p>
+                    <div class="payment-box">
+                        <p><i class="fa-solid fa-credit-card"></i> Aceptamos pagos digitales</p>
+                        <a id="mp-link" href="#" target="_blank" class="mp-btn">
+                            <i class="fa-solid fa-bolt"></i> Pagar con Mercado Pago
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Col 2: Enlaces Rápidos -->
+                <div class="footer-col">
+                    <h5>Navegación</h5>
+                    <ul class="footer-links">
+                        <li><a href="#inicio"><i class="fa-solid fa-chevron-right"></i> Inicio</a></li>
+                        <li><a href="#menu-section"><i class="fa-solid fa-chevron-right"></i> Menú Completo</a></li>
+                        <li><a href="#nosotros"><i class="fa-solid fa-chevron-right"></i> Misión y Visión</a></li>
+                        <li><a href="#testimonios"><i class="fa-solid fa-chevron-right"></i> Opiniones</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Contacto & Redes -->
+                <div class="footer-col">
+                    <h5>Contacto Directo</h5>
+                    <p class="contact-item"><i class="fa-solid fa-phone"></i> Principal: <a id="tel-1" href="#"></a></p>
+                    <p class="contact-item"><i class="fa-solid fa-mobile-screen-button"></i> Secundario: <a id="tel-2" href="#"></a></p>
+                    <p class="contact-item" id="footer-address"><i class="fa-solid fa-location-dot"></i> Cargando ubicación...</p>
+
+                    <div class="social-btns">
+                        <a id="social-fb" href="#" target="_blank" class="social-btn fb"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a id="social-ig" href="#" target="_blank" class="social-btn ig"><i class="fa-brands fa-instagram"></i></a>
+                        <a id="social-tw" href="#" target="_blank" class="social-btn tw"><i class="fa-brands fa-x-twitter"></i></a>
+                    </div>
+                </div>
+
+                <!-- Col 4: Mapa Google Maps Embebido -->
+                <div class="footer-col map-col">
+                    <h5>Estamos Ubicados En</h5>
+                    <div class="map-wrapper">
+                        <iframe
+                                src="https://maps.google.com/maps?q=Cocina%20Guerrero%20Jiutepec&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                                width="100%"
+                                height="160"
+                                style="border:0; border-radius:10px;"
+                                allowfullscreen=""
+                                loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>© 2026 Cocina Guerrero. Todos los derechos reservados. | Desarrollado con FoStudio</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botón Flotante WhatsApp + Tooltip -->
+    <!-- Botones Flotantes: Redes Sociales Desplegables -->
+    <div class="social-floatings-container" id="social-floatings-container">
+        <a id="social-float-fb" href="#" target="_blank" class="social-float-btn fb" title="Facebook">
+            <i class="fa-brands fa-facebook-f"></i>
+        </a>
+        <a id="social-float-ig" href="#" target="_blank" class="social-float-btn ig" title="Instagram">
+            <i class="fa-brands fa-instagram"></i>
+        </a>
+        <a id="social-float-tw" href="#" target="_blank" class="social-float-btn tw" title="Twitter">
+            <i class="fa-brands fa-x-twitter"></i>
+        </a>
+        <button class="social-toggle-btn" id="social-toggle-btn" aria-label="Abrir redes sociales">
+            <i class="fa-solid fa-share-nodes"></i>
+        </button>
+    </div>
+
+    <!-- Botón Flotante WhatsApp + Tooltip -->
+    <div class="floating-wa-container">
+        <div id="wa-tooltip" class="wa-tooltip">
+            <i class="fa-solid fa-comment-dots"></i> ¡Haz tu pedido por aquí!
+        </div>
+        <a id="btn-wa-float" href="#" target="_blank" class="wa-float-btn" aria-label="WhatsApp">
+            <i class="fa-brands fa-whatsapp"></i>
+        </a>
+    </div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

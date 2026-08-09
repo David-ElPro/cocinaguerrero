@@ -1,0 +1,1087 @@
+:root {
+    --primary-color: #DC2626;
+    --accent-color: #EAB308;
+    --bg-color: #F8FAFC;
+    --card-bg: #FFFFFF;
+    --text-main: #1E293B;
+    --text-muted: #64748B;
+    --border-color: #E2E8F0;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    scroll-behavior: smooth;
+}
+
+/* Fondo de Patrón Restaurante con Opacidad */
+body {
+    background-color: var(--bg-color);
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%20334155' fill-opacity='0.03' fill-rule='evenodd'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
+    color: var(--text-main);
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+/* Navbar */
+.navbar {
+    background: #ffffff;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.brand img {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--accent-color);
+}
+
+.brand h2 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.status-badge {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.nav-menu {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-main);
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.nav-link:hover {
+    color: var(--primary-color);
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.gmb-btn {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-decoration: none;
+    background: #FEF2F2;
+    padding: 8px 14px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.gmb-btn:hover {
+    background: #FEE2E2;
+}
+
+.nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    color: var(--text-main);
+    cursor: pointer;
+}
+
+/* Hero Section */
+.hero {
+    position: relative;
+    height: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #ffffff;
+    overflow: hidden;
+}
+
+.carousel-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: background-image 1s ease-in-out;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 650px;
+    padding: 20px;
+}
+
+.hero-tag {
+    background: var(--accent-color);
+    color: #000;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 4px 14px;
+    border-radius: 20px;
+    text-transform: uppercase;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 12px 0 6px;
+}
+
+.hero p {
+    font-size: 1rem;
+    color: #CBD5E1;
+    margin-bottom: 24px;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: #ffffff;
+}
+
+.btn-whatsapp {
+    background: #22C55E;
+    color: #ffffff;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Banner del Día */
+.daily-banner {
+    margin-top: 30px;
+}
+
+.banner-card {
+    background: #FFFBEB;
+    border: 1px solid #FDE68A;
+    border-radius: 16px;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.banner-icon {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+}
+
+.banner-text {
+    flex: 1;
+}
+
+.banner-text h3 {
+    font-size: 1.05rem;
+    color: #92400E;
+}
+
+.banner-text p {
+    font-size: 0.88rem;
+    color: #B45309;
+}
+
+.banner-btn {
+    background: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Animación sutil para el ícono de campana */
+.banner-icon {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.banner-icon .fa-bell {
+    transform-origin: center 30%;
+    animation: bell-ring 3s ease-in-out infinite;
+    /* animación leve: breve inclinación y regreso */
+}
+
+@keyframes bell-ring {
+    0% { transform: rotate(0deg); }
+    10% { transform: rotate(-8deg); }
+    20% { transform: rotate(6deg); }
+    30% { transform: rotate(-4deg); }
+    40% { transform: rotate(2deg); }
+    50% { transform: rotate(0deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* Catalog Cards */
+.category-header {
+    margin: 40px 0 16px;
+}
+
+.category-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.category-note {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+/* Cambiar grid de cards en mobile a 2 columnas */
+@media (max-width: 768px) {
+    .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .nav-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--primary-color);  /* Cambiar a rojo primario */
+        flex-direction: column;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-color);
+        box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+        display: none;
+    }
+
+    .nav-menu.active {
+        display: flex;
+    }
+
+    /* Cambiar color de los links del navbar en mobile */
+    .nav-menu .nav-link {
+        color: var(--primary-color);  /* Links blancos en nav mobile */
+    }
+
+    .nav-menu .nav-link:hover {
+        color: var(--accent-color);  /* Hover en color amarillo */
+    }
+
+    .nav-toggle {
+        display: block;
+    }
+
+    /* Ocultar Google Maps en mobile */
+    .gmb-btn {
+        display: none;
+    }
+
+    .testimonial-card {
+        min-width: 100%;
+    }
+
+    .hero h1 {
+        font-size: 1.8rem;
+    }
+
+    .video-container {
+        padding-bottom: 56.25%;
+    }
+}
+
+.food-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.food-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.08);
+}
+
+.card-img-wrapper {
+    position: relative;
+    height: 160px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.card-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.food-card:hover .card-img-wrapper img {
+    transform: scale(1.05);
+}
+
+.card-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: var(--primary-color);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
+.card-body {
+    padding: 14px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.card-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.35;
+    margin-bottom: 12px;
+}
+
+.card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border-color);
+}
+
+.card-price {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.btn-card-wa {
+    background: #22C55E;
+    color: white;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 8px 12px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+
+.btn-card-wa:hover {
+    background: #16A34A;
+}
+@media (max-width: 768px) {
+    .nav-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #ffffff;
+        flex-direction: column;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-color);
+        box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+        display: none;
+    }
+
+    .nav-menu.active {
+        display: flex;
+    }
+
+    .nav-toggle {
+        display: block;
+    }
+
+    /* Reducir tamaño del precio y botón en mobile */
+    .card-price {
+        font-size: 0.9rem;
+    }
+
+    .btn-card-wa {
+        font-size: 0.2rem;
+        padding: 2px 5px;
+    }
+
+    .testimonial-card {
+        min-width: 100%;
+    }
+
+    .hero h1 {
+        font-size: 1.8rem;
+    }
+
+    .video-container {
+        padding-bottom: 56.25%;
+    }
+}
+
+/* Nosotros (Misión y Visión) */
+.nosotros-section {
+    margin: 50px auto;
+}
+
+.nosotros-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.nosotros-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    padding: 24px;
+    border-radius: 16px;
+}
+
+/* Separación del título h3 dentro de la sección Nosotros para evitar solapamiento
+   cuando las cards se elevan en hover (especialmente en mobile) */
+.nosotros-section .section-title {
+    margin-bottom: 18px;
+}
+
+/* Centrar títulos y contenido dentro de las cards de 'Nosotros' */
+.nosotros-card,
+.nosotros-card h4,
+.nosotros-card p {
+    text-align: center;
+}
+
+/* Transición para hover suave */
+.nosotros-card {
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+/* Al hacer hover en web y mobile, convertir la card a color primario y texto/ícono en blanco */
+.nosotros-card:hover {
+    background: var(--primary-color);
+    border-color: rgba(0,0,0,0.06);
+    color: #ffffff;
+}
+
+.nosotros-card:hover .card-icon-header {
+    color: #ffffff;
+}
+
+.nosotros-card:hover h4 {
+    color: #ffffff;
+}
+
+.nosotros-card:hover p {
+    color: rgba(255,255,255,0.95);
+}
+
+/* Elevación al hacer hover para destacar la card */
+.nosotros-card:hover {
+    box-shadow: 0 12px 30px rgba(220,38,38,0.18);
+    transform: translateY(-6px);
+}
+
+.card-icon-header {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.nosotros-card h4 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.nosotros-card p {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* Video Section */
+.video-section {
+    margin: 50px auto;
+}
+
+.video-container {
+    position: relative;
+    padding-bottom: 45%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    background: #000;
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+/* Testimonios Carrusel */
+.testimonials-section {
+    margin: 50px auto;
+}
+
+.testimonials-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.carousel-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.ctrl-btn {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: var(--text-main);
+    transition: background 0.2s;
+}
+
+.ctrl-btn:hover {
+    background: var(--border-color);
+}
+
+.testi-carousel-wrapper {
+    overflow: hidden;
+    width: 100%;
+}
+
+.testi-track {
+    display: flex;
+    gap: 16px;
+    transition: transform 0.4s ease-in-out;
+}
+
+.testimonial-card {
+    min-width: calc(33.333% - 11px);
+    background: white;
+    border: 1px solid var(--border-color);
+    padding: 20px 20px 48px 20px; /* espacio inferior para avatar */
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative; /* para posicionar avatar */
+}
+
+.testi-stars {
+    color: var(--accent-color);
+    font-size: 0.8rem;
+    margin-bottom: 8px;
+}
+
+.testimonial-card p {
+    font-size: 0.88rem;
+    color: #334155;
+    line-height: 1.4;
+}
+
+.testimonial-card span {
+    display: block;
+    margin-top: 12px;
+    font-weight: 700;
+    color: var(--primary-color);
+    font-size: 0.82rem;
+}
+
+/* Avatar circular en la esquina inferior derecha de la card */
+.testi-avatar {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #ffffff;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.testi-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.testi-avatar i {
+    color: #94A3B8;
+    font-size: 1.25rem;
+}
+
+@media (max-width: 900px) {
+    .testi-avatar {
+        width: 48px;
+        height: 48px;
+        right: 10px;
+        bottom: 10px;
+    }
+}
+
+/* Footer Full Width */
+footer {
+    background: #0F172A;
+    color: #94A3B8;
+    width: 100%;
+    margin-top: 60px;
+    padding-top: 50px;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+    padding-bottom: 40px;
+}
+
+.footer-col h4, .footer-col h5 {
+    color: #ffffff;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.footer-brand {
+    font-size: 1.3rem;
+}
+
+.footer-slogan {
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+}
+
+.payment-box {
+    background: #1E293B;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #334155;
+}
+
+.payment-box p {
+    font-size: 0.78rem;
+    color: #CBD5E1;
+    margin-bottom: 8px;
+}
+
+.mp-btn {
+    display: inline-block;
+    background: #009EE3;
+    color: white;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: opacity 0.2s;
+}
+
+.mp-btn:hover {
+    opacity: 0.9;
+}
+
+.footer-links {
+    list-style: none;
+}
+
+.footer-links li {
+    margin-bottom: 10px;
+}
+
+.footer-links a {
+    color: #94A3B8;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+}
+
+.footer-links a:hover {
+    color: #ffffff;
+}
+
+.contact-item {
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+}
+
+.contact-item a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.social-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.social-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #1E293B;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.social-btn:hover {
+    background: var(--primary-color);
+}
+
+.footer-bottom {
+    text-align: center;
+    padding: 20px 0;
+    border-top: 1px solid #1E293B;
+    font-size: 0.8rem;
+}
+
+/* Floating WA Button */
+.floating-wa-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.wa-tooltip {
+    background: #1E293B;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    white-space: nowrap;
+}
+
+.wa-float-btn {
+    width: 56px;
+    height: 56px;
+    background: #22C55E;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+    text-decoration: none;
+    transition: transform 0.2s;
+}
+
+.wa-float-btn:hover {
+    transform: scale(1.08);
+}
+
+/* Responsivo */
+@media (max-width: 900px) {
+    .testimonial-card {
+        min-width: calc(50% - 8px);
+    }
+}
+/* Botones Flotantes de Redes Sociales Desplegables */
+.social-floatings-container {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.social-floatings-container.hidden {
+    display: none;
+}
+
+.social-float-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: white;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.2s, opacity 0.3s;
+    opacity: 0;
+    transform: scale(0.5);
+    pointer-events: none;
+}
+
+.social-floatings-container.open .social-float-btn {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+.social-float-btn:nth-child(1) {
+    transition-delay: 0.05s;
+}
+
+.social-float-btn:nth-child(2) {
+    transition-delay: 0.1s;
+}
+
+.social-float-btn:nth-child(3) {
+    transition-delay: 0.15s;
+}
+
+.social-float-btn.fb {
+    background: #1877F2;
+}
+
+.social-float-btn.ig {
+    background: #E4405F;
+}
+
+.social-float-btn.tw {
+    background: #000000;
+}
+
+.social-float-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Botón toggle para abrir/cerrar redes sociales */
+.social-toggle-btn {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #1877F2, #E4405F);
+    color: white;
+    border-radius: 50%;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+    z-index: 1000;
+}
+
+.social-toggle-btn:hover {
+    transform: scale(1.08);
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        background: var(--primary-color);
+    }
+
+    .brand h2 {
+        color: #ffffff;
+    }
+
+    .status-badge {
+        color: #ffffff;
+    }
+
+    .nav-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--primary-color);
+        flex-direction: column;
+        padding: 16px 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 10px 15px rgba(0,0,0,0.15);
+        display: none;
+    }
+
+    .nav-menu.active {
+        display: flex;
+    }
+
+    .nav-menu .nav-link {
+        color: #ffffff;
+    }
+
+    .nav-menu .nav-link:hover {
+        color: var(--accent-color);
+    }
+
+    .nav-toggle {
+        display: flex;
+        color: #ffffff;
+    }
+
+    .nav-toggle i {
+        transition: transform 0.3s ease;
+    }
+
+    .nav-toggle.active i {
+        transform: rotate(90deg);
+    }
+
+    /* Reducir tamaño del precio y botón en mobile */
+    .card-price {
+        font-size: 0.9rem;
+    }
+
+    .btn-card-wa {
+        font-size: 0.6rem;
+        padding: 4px 8px;
+    }
+
+    .testimonial-card {
+        min-width: 100%;
+    }
+
+    .hero h1 {
+        font-size: 1.8rem;
+    }
+
+    .video-container {
+        padding-bottom: 56.25%;
+    }
+
+    /* Centrar botón de 'Consultar Guisados del Día' en mobile y adaptar banner */
+    .banner-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .banner-icon {
+        margin-bottom: 4px;
+    }
+
+    .banner-btn {
+        margin-top: 6px;
+        align-self: center;
+    }
+
+    /* Centrar títulos de sección en mobile */
+    .section-title {
+        text-align: center;
+    }
+}
