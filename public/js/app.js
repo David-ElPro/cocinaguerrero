@@ -562,10 +562,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     if (menuSearchInput) {
+        const toggleFiltersVisibility = () => {
+            if (!categoryFiltersContainer) return;
+
+            const hasSearchText = (menuSearchInput.value || "").trim().length > 0;
+            categoryFiltersContainer.style.display = hasSearchText ? "none" : "flex";
+        };
+
+        menuSearchInput.addEventListener("focus", () => {
+            if (window.innerWidth <= 768) {
+                window.scrollTo({ top: document.getElementById("menu-section").offsetTop - 20, behavior: "smooth" });
+            }
+        });
+
         menuSearchInput.addEventListener("input", (event) => {
             activeSearchTerm = event.target.value.trim();
+            toggleFiltersVisibility();
             renderMenuWithFilters();
         });
+
+        menuSearchInput.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                menuSearchInput.value = "";
+                activeSearchTerm = "";
+                toggleFiltersVisibility();
+                renderMenuWithFilters();
+                menuSearchInput.blur();
+            }
+        });
+
+        toggleFiltersVisibility();
     }
 
     const buildWhatsAppOrder = (waNumber, cart) => {
