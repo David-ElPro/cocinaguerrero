@@ -393,21 +393,36 @@ body {
     .menu-toolbar {
         flex-direction: column;
         align-items: stretch;
+        width: 100%;
+        gap: 10px;
     }
 
     .menu-search-wrap {
         max-width: none;
+        width: 100%;
+    }
+
+    .menu-search-wrap input {
+        width: 100%;
+        min-height: 48px;
+        font-size: 0.95rem;
     }
 
     .category-filters {
-        justify-content: flex-start;
-        overflow-x: auto;
-        padding-bottom: 4px;
-        flex-wrap: nowrap;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+        gap: 8px;
+        justify-content: stretch;
     }
 
     .category-filter {
+        width: 100%;
+        min-width: 0;
         white-space: nowrap;
+        justify-content: center;
+        padding: 10px 8px;
+        font-size: 0.78rem;
     }
 
     .cards-grid {
@@ -1645,6 +1660,20 @@ footer {
 }
 
 @media (max-width: 420px) {
+    .menu-toolbar {
+        margin-top: 16px;
+    }
+
+    .menu-search-wrap input {
+        font-size: 0.88rem;
+        padding-left: 40px;
+    }
+
+    .category-filter {
+        font-size: 0.72rem;
+        padding: 9px 6px;
+    }
+
     .cart-summary-count {
         width: 30px;
         height: 30px;
