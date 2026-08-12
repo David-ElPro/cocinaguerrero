@@ -179,6 +179,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         return labels[category] || category.replace(/-/g, " ");
     };
 
+    const getCategoryIcon = (category) => {
+        const icons = {
+            "a-la-carta": "fa-solid fa-book-open",
+            platos: "fa-solid fa-utensils",
+            bebidas: "fa-solid fa-mug-hot",
+            postres: "fa-solid fa-ice-cream",
+            snacks: "fa-solid fa-cookie-bite",
+            "del-comal": "fa-solid fa-fire-burner",
+            especiales: "fa-solid fa-star"
+        };
+
+        return icons[category] || "fa-solid fa-utensils";
+    };
+
     let productHandlersBound = false;
     let cartHandlersBound = false;
 
@@ -221,7 +235,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             catalogContainer.innerHTML = orderedCategories.map((category) => `
                 <section class="menu-category-section">
                     <div class="category-header">
-                        <h3 class="category-title"><i class="fa-solid fa-utensils"></i> ${getCategoryLabel(category)}</h3>
+                        <h3 class="category-title"><i class="${getCategoryIcon(category)}"></i> ${getCategoryLabel(category)}</h3>
                     </div>
                     <div class="cards-grid">
                         ${groupedItems[category].map((item) => `
@@ -496,6 +510,65 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!response.ok) throw new Error("Cliente no encontrado");
 
         const data = await response.json();
+
+        const setSeoMeta = (restaurantData) => {
+            const restaurantName = restaurantData.nombre || "Cocina Guerrero";
+            const description = restaurantData.eslogan || "Menú digital con pedidos por WhatsApp.";
+            const siteUrl = window.location.href.split("#")[0];
+            const phone = normalizePhone(restaurantData.whatsapp || "521234567890");
+
+            const metaMap = {
+                "description": description,
+                "og:title": `${restaurantName} | Menú Digital`,
+                "og:description": description,
+                "og:url": siteUrl,
+                "og:site_name": restaurantName,
+                "twitter:title": `${restaurantName} | Menú Digital`,
+                "twitter:description": description
+            };
+
+            Object.entries(metaMap).forEach(([key, value]) => {
+                const selector = key.startsWith("og:") ? `meta[property="${key}"]` : `meta[name="${key}"]`;
+                let meta = document.querySelector(selector);
+
+                if (!meta) {
+                    meta = document.createElement("meta");
+                    if (key.startsWith("og:")) {
+                        meta.setAttribute("property", key);
+                    } else {
+                        meta.setAttribute("name", key);
+                    }
+                    document.head.appendChild(meta);
+                }
+
+                meta.setAttribute("content", value);
+            });
+
+            const schemaScript = document.getElementById("restaurant-schema") || document.createElement("script");
+            schemaScript.id = "restaurant-schema";
+            schemaScript.type = "application/ld+json";
+            schemaScript.textContent = JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Restaurant",
+                "name": restaurantName,
+                "image": restaurantData.logo || "img/logo.png",
+                "description": description,
+                "servesCuisine": "Mexican",
+                "telephone": `+${phone}`,
+                "url": siteUrl,
+                "menu": `${siteUrl}#menu-section`,
+                "address": {
+                    "@type": "PostalAddress",
+                    "streetAddress": restaurantData.direccion || "Morelos",
+                    "addressLocality": restaurantData.ciudad || "Jiutepec",
+                    "addressRegion": restaurantData.estado || "Morelos",
+                    "addressCountry": "MX"
+                }
+            });
+            document.head.appendChild(schemaScript);
+        };
+
+        setSeoMeta(data);
 
         document.title = `${data.nombre} | Menú Digital`;
         document.getElementById("client-logo").src = data.logo;
