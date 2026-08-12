@@ -575,26 +575,27 @@ body {
     justify-content: space-between;
     padding-top: 10px;
     border-top: 1px dashed var(--border-color);
-position: relative; /* permite centrar el control de cantidad dentro de la card */
 }
 
-/* Centrar el control de cantidad horizontalmente dentro de la card (desktop) */
+/* Control de cantidad en flujo normal (no absolute) para evitar solapamientos y permitir stacking en mobile */
 .card-footer .qty-control {
-position: absolute;
-left: 50%;
-top: 50%;
-transform: translate(-50%, -50%);
-background: #f8fafc;
-padding: 6px 8px;
-border-radius: 12px;
+    position: static;
+    margin-left: 12px;
+    background: #f8fafc;
+    padding: 6px 8px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
-/* Pequeños ajustes visuales para el control */
+/* Pequeños ajustes visuales para el control (más compacto) */
 .qty-control .qty-btn {
-width: 34px;
-height: 34px;
-border-radius: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
 }
+
 
 .qty-input,
 .cart-qty-input {
@@ -1049,9 +1050,9 @@ footer {
 /* Floating WA Button */
 .floating-wa-container {
     position: fixed;
-    bottom: 20px;
+    bottom: 96px;
     right: 20px;
-    z-index: 1000;
+    z-index: 1200; /* debajo del modal de carrito (1300) */
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -1097,13 +1098,19 @@ footer {
 /* Botones Flotantes de Redes Sociales Desplegables */
 .social-floatings-container {
     position: fixed;
-    bottom: 90px;
+    bottom: 160px;
     right: 20px;
-    z-index: 999;
+    z-index: 1250; /* debajo del modal, un poco por encima de WA */
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 8px;
+}
+
+@media (max-width: 420px) {
+    /* elevar ligeramente para no chocar con otros feedbacks en mobile */
+    .floating-wa-container { bottom: 96px; }
+    .social-floatings-container { bottom: 160px; }
 }
 
 .social-floatings-container.hidden {
@@ -1460,15 +1467,73 @@ footer {
 }
 
 .cart-item-row {
-    display: grid;
-    grid-template-columns: 56px minmax(0, 1fr) auto auto;
-    align-items: center;
-    gap: 12px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
     background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
     border: 1px solid rgba(148, 163, 184, 0.3);
     border-radius: 14px;
-    padding: 12px 14px;
+    padding: 12px;
     box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+}
+
+.cart-item-row .cart-remove-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: transparent; /* más discreto */
+    color: rgba(220,38,38,0.9);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(220,38,38,0.08);
+    cursor: pointer;
+    box-shadow: none;
+}
+
+.cart-item-row .cart-remove-btn i {
+    font-size: 0.95rem;
+}
+
+.cart-item-thumb img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+    border: 2px solid rgba(0,0,0,0.06);
+}
+
+.cart-item-info {
+    min-width: 0;
+}
+
+.cart-item-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(248, 250, 252, 0.9);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 12px;
+    padding: 4px 6px;
+    margin-top: 8px;
+}
+
+.cart-item-total {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.cart-item-total-label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
 }
 
 .cart-item-info {
@@ -1476,20 +1541,29 @@ footer {
 }
 
 .cart-item-thumb img {
-    width: 56px;
-    height: 56px;
+    width: 64px;
+    height: 64px;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 12px;
     display: block;
+    margin: 0 auto;
 }
 
 @media (max-width: 768px) {
     .cart-item-row {
-        grid-template-columns: minmax(0, 1fr) auto;
+        flex-direction: column;
+        gap: 8px;
     }
     .cart-item-thumb {
-        display: none;
+        display: block;
+        order: 3;
+        margin-top: 6px;
+        width: 64px;
+        height: 64px;
     }
+    .cart-item-info { order: 1; }
+    .cart-item-actions { order: 2; }
+    .cart-item-row .cart-remove-btn { top: 8px; right: 10px; }
 }
 
 .cart-item-name {
@@ -1520,24 +1594,25 @@ footer {
     display: flex;
     align-items: center;
     gap: 8px;
-    justify-content: flex-end;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .mini-qty-btn,
 .qty-btn {
     border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 9px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
     cursor: pointer;
     background: #fff2f2;
     color: var(--primary-color);
-    font-size: 1.1rem;
-    font-weight: 800;
+    font-size: 1rem;
+    font-weight: 700;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.15s ease, background 0.15s ease;
+    transition: transform 0.12s ease, background 0.12s ease;
 }
 
 .mini-qty-btn:active,

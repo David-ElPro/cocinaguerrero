@@ -327,7 +327,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     nombre: item.nombre,
                     precio: Number.parseFloat(String(item.precio).replace(/[$,\s]/g, "")) || 0,
                     descripcion: item.descripcion || "",
-                    imagen: item.imagen || "./img/logo.png",
+                                imagen: item.imagen || item.image || item.img || "./img/logo.png",
                     categoria: normalizeCategory(item.categoria)
                 }));
 
@@ -539,22 +539,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         cartItemsList.innerHTML = cart.map((item) => `
             <div class="cart-item-row">
-                <div class="cart-item-thumb"><img src="${item.imagen || './img/logo.png'}" alt="${item.nombre}" loading="lazy" decoding="async" fetchpriority="low"></div>
+                <button class="cart-remove-btn" type="button" data-item-id="${item.id}" aria-label="Eliminar ${item.nombre}">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
                 <div class="cart-item-info">
                     <span class="cart-item-name">${item.nombre}</span>
                     <span class="cart-item-price">${formatCurrency(item.precio)} c/u</span>
                 </div>
-                <div class="cart-item-controls">
-                    <button class="mini-qty-btn" type="button" data-action="decrease" data-item-id="${item.id}" aria-label="Restar ${item.nombre}">−</button>
-                    <input class="cart-qty-input" type="number" min="0" step="1" value="${item.cantidad}" data-item-id="${item.id}" aria-label="Cantidad de ${item.nombre}">
-                    <button class="mini-qty-btn" type="button" data-action="increase" data-item-id="${item.id}" aria-label="Sumar ${item.nombre}">+</button>
-                </div>
                 <div class="cart-item-actions">
-                    <strong>${formatCurrency(item.precio * item.cantidad)}</strong>
-                    <button class="cart-remove-btn" type="button" data-item-id="${item.id}" aria-label="Eliminar ${item.nombre}">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
+                    <div class="cart-item-controls">
+                        <button class="mini-qty-btn" type="button" data-action="decrease" data-item-id="${item.id}" aria-label="Restar ${item.nombre}">−</button>
+                        <input class="cart-qty-input" type="number" min="0" step="1" value="${item.cantidad}" data-item-id="${item.id}" aria-label="Cantidad de ${item.nombre}">
+                        <button class="mini-qty-btn" type="button" data-action="increase" data-item-id="${item.id}" aria-label="Sumar ${item.nombre}">+</button>
+                    </div>
+                    <div class="cart-item-total">
+                        <span class="cart-item-total-label">Total</span>
+                        <strong>${formatCurrency(item.precio * item.cantidad)}</strong>
+                    </div>
                 </div>
+                <div class="cart-item-thumb"><img src="${item.imagen || './img/logo.png'}" alt="${item.nombre}" loading="lazy" decoding="async" fetchpriority="low"></div>
             </div>
         `).join("");
 
