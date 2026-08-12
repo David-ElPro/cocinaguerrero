@@ -61,6 +61,39 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const saveCart = (cart) => localStorage.setItem(CART_KEY, JSON.stringify(cart));
 
+    const syncCartWithMenuItems = () => {
+        const cart = getCart();
+        if (!cart.length || !allMenuItems.length) return cart;
+
+        const menuMap = new Map(allMenuItems.map((item) => [item.id, item]));
+        const syncedCart = cart.reduce((accumulator, cartItem) => {
+            const menuItem = menuMap.get(cartItem.id);
+            if (!menuItem) return accumulator;
+
+            accumulator.push({
+                ...cartItem,
+                nombre: menuItem.nombre,
+                precio: menuItem.precio,
+                imagen: menuItem.imagen || "./img/logo.png"
+            });
+            return accumulator;
+        }, []);
+
+        const hasChanges = syncedCart.length !== cart.length || syncedCart.some((item, index) => {
+            const current = cart[index];
+            return !current
+                || current.nombre !== item.nombre
+                || Number(current.precio) !== Number(item.precio)
+                || current.imagen !== item.imagen;
+        });
+
+        if (hasChanges) {
+            saveCart(syncedCart);
+        }
+
+        return syncedCart;
+    };
+
     const setCartQuantity = (itemId, nextQty) => {
         const cart = getCart();
         const itemIndex = cart.findIndex((item) => item.id === itemId);
@@ -368,7 +401,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     const refreshQuantityDisplays = () => {
-        const cart = getCart();
+        const cart = syncCartWithMenuItems();
         const cartMap = new Map(cart.map((item) => [item.id, item]));
 
         document.querySelectorAll(".qty-control").forEach((control) => {
@@ -385,7 +418,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     const syncCartTotals = () => {
-        const cart = getCart();
+        const cart = syncCartWithMenuItems();
         const totalItems = cart.reduce((sum, item) => sum + Number(item.cantidad || 0), 0);
         const totalPrice = cart.reduce((sum, item) => sum + (Number(item.precio || 0) * Number(item.cantidad || 0)), 0);
 
@@ -522,7 +555,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     const renderCartModal = () => {
-        const cart = getCart();
+        const cart = syncCartWithMenuItems();
 
         if (!cart.length) {
             cartItemsList.innerHTML = `
@@ -542,22 +575,26 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <button class="cart-remove-btn" type="button" data-item-id="${item.id}" aria-label="Eliminar ${item.nombre}">
                     <i class="fa-solid fa-trash"></i>
                 </button>
-                <div class="cart-item-info">
-                    <span class="cart-item-name">${item.nombre}</span>
-                    <span class="cart-item-price">${formatCurrency(item.precio)} c/u</span>
+                <div class="cart-item-thumb">
+                    <img src="${item.imagen || './img/logo.png'}" alt="${item.nombre}" loading="lazy" decoding="async" fetchpriority="low">
                 </div>
-                <div class="cart-item-actions">
+                <div class="cart-item-body">
+                    <div class="cart-item-info">
+                        <span class="cart-item-name">${item.nombre}</span>
+                        <span class="cart-item-price">${formatCurrency(item.precio)} c/u</span>
+                    </div>
                     <div class="cart-item-controls">
                         <button class="mini-qty-btn" type="button" data-action="decrease" data-item-id="${item.id}" aria-label="Restar ${item.nombre}">−</button>
                         <input class="cart-qty-input" type="number" min="0" step="1" value="${item.cantidad}" data-item-id="${item.id}" aria-label="Cantidad de ${item.nombre}">
                         <button class="mini-qty-btn" type="button" data-action="increase" data-item-id="${item.id}" aria-label="Sumar ${item.nombre}">+</button>
-                    </div>
+                        </div>
+                </div>
+                <div class="cart-item-aside">
                     <div class="cart-item-total">
                         <span class="cart-item-total-label">Total</span>
                         <strong>${formatCurrency(item.precio * item.cantidad)}</strong>
                     </div>
                 </div>
-                <div class="cart-item-thumb"><img src="${item.imagen || './img/logo.png'}" alt="${item.nombre}" loading="lazy" decoding="async" fetchpriority="low"></div>
             </div>
         `).join("");
 
