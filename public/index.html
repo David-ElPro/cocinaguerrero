@@ -280,14 +280,67 @@
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-            <div id="cart-items-list" class="cart-items-list"></div>
-            <div class="cart-footer-summary">
-                <span>Total general</span>
-                <strong id="cart-total">$0</strong>
+            <div id="cart-view" class="cart-view">
+                <div id="cart-items-list" class="cart-items-list"></div>
+                <div class="cart-footer-summary">
+                    <span>Total general</span>
+                    <strong id="cart-total">$0</strong>
+                </div>
+                <button id="send-cart-wa" class="cart-submit-btn" type="button">
+                    <i class="fa-brands fa-whatsapp"></i> Continuar con el pedido
+                </button>
             </div>
-            <button id="send-cart-wa" class="cart-submit-btn" type="button">
-                <i class="fa-brands fa-whatsapp"></i> Enviar pedido por WhatsApp
-            </button>
+            <div id="checkout-view" class="checkout-view" hidden>
+                <div class="checkout-ticket">
+                    <div class="checkout-ticket-head">
+                        <div>
+                            <p class="checkout-ticket-kicker">Previsualizacion</p>
+                            <h4>Tu ticket</h4>
+                        </div>
+                        <span class="checkout-ticket-badge"><i class="fa-solid fa-receipt"></i> Listo para WhatsApp</span>
+                    </div>
+                    <div id="checkout-ticket-items" class="checkout-ticket-items"></div>
+                    <div class="checkout-ticket-total">
+                        <span>Total estimado</span>
+                        <strong id="checkout-total">$0</strong>
+                    </div>
+                </div>
+
+                <form id="checkout-form" class="checkout-form">
+                    <label class="checkout-field">
+                        <span>Nombre (opcional)</span>
+                        <input id="checkout-name" type="text" placeholder="Ej. Miguel">
+                    </label>
+                    <label class="checkout-field">
+                        <span>Telefono (opcional)</span>
+                        <input id="checkout-phone" type="tel" inputmode="tel" placeholder="Ej. 7771234567">
+                    </label>
+                    <label class="checkout-field">
+                        <span>Tipo de entrega</span>
+                        <select id="checkout-delivery">
+                            <option value="Recoger en tienda">Recoger en tienda</option>
+                            <option value="Entrega a domicilio">Entrega a domicilio</option>
+                        </select>
+                    </label>
+                    <label class="checkout-field">
+                        <span>¿En cuanto tiempo pasas o lo recibes? (opcional)</span>
+                        <input id="checkout-time" type="text" placeholder="Ej. En 20 minutos">
+                    </label>
+                    <label class="checkout-field checkout-field-full">
+                        <span>Notas o referencia (opcional)</span>
+                        <textarea id="checkout-notes" rows="3" placeholder="Ej. Sin cebolla / paso por el a las 2:30 / entregar en recepcion"></textarea>
+                    </label>
+                </form>
+
+                <div class="checkout-actions">
+                    <button id="back-to-cart-btn" class="checkout-secondary-btn" type="button">
+                        <i class="fa-solid fa-arrow-left"></i> Volver al carrito
+                    </button>
+                    <button id="confirm-cart-wa" class="cart-submit-btn" type="button">
+                        <i class="fa-brands fa-whatsapp"></i> Enviar ticket por WhatsApp
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 

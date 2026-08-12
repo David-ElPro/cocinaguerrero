@@ -16,11 +16,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     const cartCountElement = document.getElementById("cart-count");
     const cartTotalDisplay = document.getElementById("cart-total-display");
     const sendCartWaBtn = document.getElementById("send-cart-wa");
+    const confirmCartWaBtn = document.getElementById("confirm-cart-wa");
+    const backToCartBtn = document.getElementById("back-to-cart-btn");
+    const cartView = document.getElementById("cart-view");
+    const checkoutView = document.getElementById("checkout-view");
+    const checkoutTicketItems = document.getElementById("checkout-ticket-items");
+    const checkoutTotalElement = document.getElementById("checkout-total");
+    const checkoutNameInput = document.getElementById("checkout-name");
+    const checkoutPhoneInput = document.getElementById("checkout-phone");
+    const checkoutDeliveryInput = document.getElementById("checkout-delivery");
+    const checkoutTimeInput = document.getElementById("checkout-time");
+    const checkoutNotesInput = document.getElementById("checkout-notes");
     const menuSearchInput = document.getElementById("menu-search");
     const categoryFiltersContainer = document.getElementById("category-filters");
     let allMenuItems = [];
     let activeCategoryFilter = "all";
     let activeSearchTerm = "";
+    let checkoutStep = "cart";
 
     const urlParams = new URLSearchParams(window.location.search);
     let clientSlug = urlParams.get("c");
@@ -400,6 +412,68 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.body.style.overflow = "";
     };
 
+    const setCheckoutStep = (step) => {
+        checkoutStep = step;
+        if (cartView) cartView.hidden = step !== "cart";
+        if (checkoutView) checkoutView.hidden = step !== "checkout";
+    };
+
+    const scrollCheckoutTargetIntoView = (target, shouldFocus = false) => {
+        if (!target || !checkoutView) return;
+
+        target.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+        if (shouldFocus && typeof target.focus === "function") {
+            window.setTimeout(() => {
+                target.focus({ preventScroll: true });
+            }, 220);
+        }
+    };
+
+    const bindCheckoutFieldProgression = () => {
+        const checkoutSequence = [
+            checkoutNameInput,
+            checkoutPhoneInput,
+            checkoutDeliveryInput,
+            checkoutTimeInput,
+            checkoutNotesInput,
+            confirmCartWaBtn
+        ].filter(Boolean);
+
+        checkoutSequence.forEach((field, index) => {
+            const nextField = checkoutSequence[index + 1];
+            if (!nextField) return;
+
+            const goNext = () => {
+                const hasValue = field.tagName === "SELECT"
+                    || String(field.value || "").trim().length > 0;
+
+                if (!hasValue || checkoutStep !== "checkout") return;
+                scrollCheckoutTargetIntoView(nextField, nextField !== confirmCartWaBtn);
+            };
+
+            if (field.tagName === "SELECT") {
+                field.addEventListener("change", goNext);
+                return;
+            }
+
+            if (field.tagName === "TEXTAREA") {
+                field.addEventListener("blur", goNext);
+                return;
+            }
+
+            field.addEventListener("change", goNext);
+            field.addEventListener("keydown", (event) => {
+                if (event.key !== "Enter") return;
+                event.preventDefault();
+                goNext();
+            });
+        });
+    };
+
     const refreshQuantityDisplays = () => {
         const cart = syncCartWithMenuItems();
         const cartMap = new Map(cart.map((item) => [item.id, item]));
@@ -425,7 +499,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         cartCountElement.textContent = String(totalItems);
         cartTotalDisplay.textContent = formatCurrency(totalPrice);
         cartTotalElement.textContent = formatCurrency(totalPrice);
+        if (checkoutTotalElement) {
+            checkoutTotalElement.textContent = formatCurrency(totalPrice);
+        }
         sendCartWaBtn.disabled = totalItems === 0;
+        if (confirmCartWaBtn) {
+            confirmCartWaBtn.disabled = totalItems === 0;
+        }
     };
 
     const updateItemInCart = (itemMeta, delta) => {
@@ -601,6 +681,36 @@ document.addEventListener("DOMContentLoaded", async () => {
         syncCartTotals();
     };
 
+    const renderCheckoutPreview = () => {
+        const cart = syncCartWithMenuItems();
+        if (!checkoutTicketItems) return;
+
+        if (!cart.length) {
+            checkoutTicketItems.innerHTML = `
+                <div class="empty-cart">
+                    <div>
+                        <i class="fa-solid fa-receipt"></i>
+                        <p>Agrega productos para generar tu ticket.</p>
+                    </div>
+                </div>
+            `;
+            syncCartTotals();
+            return;
+        }
+
+        checkoutTicketItems.innerHTML = cart.map((item) => `
+            <div class="checkout-ticket-item">
+                <div class="checkout-ticket-item-main">
+                    <strong>${item.nombre}</strong>
+                    <span>${item.cantidad} x ${formatCurrency(item.precio)}</span>
+                </div>
+                <strong>${formatCurrency(item.precio * item.cantidad)}</strong>
+            </div>
+        `).join("");
+
+        syncCartTotals();
+    };
+
     if (menuSearchInput) {
         const toggleFiltersVisibility = () => {
             if (!categoryFiltersContainer) return;
@@ -645,6 +755,38 @@ document.addEventListener("DOMContentLoaded", async () => {
             `Total: ${formatCurrency(cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0))}`,
             "",
             "Gracias."
+        ];
+
+        return `https://wa.me/${waNumber}?text=${encodeURIComponent(lines.join("\n"))}`;
+    };
+
+    const buildCheckoutWhatsAppOrder = (waNumber, cart, customerDetails = {}) => {
+        if (!cart.length) return "";
+
+        const total = cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+        const nombre = String(customerDetails.nombre || "").trim();
+        const telefono = String(customerDetails.telefono || "").trim();
+        const entrega = String(customerDetails.entrega || "Recoger en tienda").trim();
+        const tiempo = String(customerDetails.tiempo || "").trim();
+        const notas = String(customerDetails.notas || "").trim();
+
+        const lines = [
+            "Hola Cocina Guerrero 👋",
+            "",
+            "🧾 *Nuevo pedido*",
+            "",
+            ...cart.map((item) => `🍽️ ${item.nombre} x${item.cantidad} = ${formatCurrency(item.precio * item.cantidad)}`),
+            "",
+            `💵 *Total:* ${formatCurrency(total)}`,
+            "",
+            "🙋 *Datos del cliente*",
+            `• Nombre: ${nombre || "No especificado"}`,
+            `• Telefono: ${telefono || "No especificado"}`,
+            `• Entrega: ${entrega || "No especificado"}`,
+            `• Tiempo estimado: ${tiempo || "Sin definir"}`,
+            `• Notas: ${notas || "Sin notas"}`,
+            "",
+            "Gracias ✨"
         ];
 
         return `https://wa.me/${waNumber}?text=${encodeURIComponent(lines.join("\n"))}`;
@@ -766,30 +908,61 @@ document.addEventListener("DOMContentLoaded", async () => {
         await renderMenuFromCsv();
 
         document.getElementById("open-cart-btn").addEventListener("click", () => {
+            setCheckoutStep("cart");
             renderCartModal();
             openCart();
         });
 
         document.getElementById("close-cart-btn").addEventListener("click", () => {
+            setCheckoutStep("cart");
             closeCart();
         });
 
         cartModal.addEventListener("click", (event) => {
             if (event.target === cartModal) {
+                setCheckoutStep("cart");
                 closeCart();
             }
         });
 
         sendCartWaBtn.addEventListener("click", () => {
-            const cart = getCart();
-            const orderUrl = buildWhatsAppOrder(waPhone, cart);
-            if (orderUrl) {
-                window.open(orderUrl, "_blank");
+            renderCheckoutPreview();
+            setCheckoutStep("checkout");
+        });
+
+        if (backToCartBtn) {
+            backToCartBtn.addEventListener("click", () => {
+                setCheckoutStep("cart");
+            });
+        }
+
+        if (confirmCartWaBtn) {
+            confirmCartWaBtn.addEventListener("click", () => {
+                const cart = syncCartWithMenuItems();
+                const orderUrl = buildCheckoutWhatsAppOrder(waPhone, cart, {
+                    nombre: checkoutNameInput?.value,
+                    telefono: checkoutPhoneInput?.value,
+                    entrega: checkoutDeliveryInput?.value,
+                    tiempo: checkoutTimeInput?.value,
+                    notas: checkoutNotesInput?.value
+                });
+
+                if (orderUrl) {
+                    window.open(orderUrl, "_blank");
+                }
+            });
+        }
+
+        window.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && checkoutStep === "checkout" && cartModal.classList.contains("is-open")) {
+                setCheckoutStep("cart");
             }
         });
 
+        bindCheckoutFieldProgression();
         refreshQuantityDisplays();
         renderCartModal();
+        setCheckoutStep("cart");
 
         const testimonialsData = [
             { nombre: "Karla M.", texto: "La milanesa y el agua del día están riquísimas. El servicio por WhatsApp es super rápido.", imagen: "./img/test1.webp" },

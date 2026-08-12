@@ -1399,6 +1399,7 @@ footer {
     display: flex;
     flex-direction: column;
     gap: 14px;
+    overflow: hidden;
     transform: translateY(18px);
     transition: transform 0.25s ease;
 }
@@ -2080,6 +2081,207 @@ footer {
 
     .cart-item-total strong {
         font-size: 0.88rem;
+    }
+}
+
+.checkout-view[hidden],
+.cart-view[hidden] {
+    display: none !important;
+}
+
+.checkout-view {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 4px;
+    padding-bottom: 10px;
+}
+
+.cart-view {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.checkout-ticket {
+    background: linear-gradient(180deg, #fffdf8 0%, #fff7ed 100%);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    border-radius: 18px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.checkout-ticket-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.checkout-ticket-kicker {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #92400e;
+    margin-bottom: 4px;
+}
+
+.checkout-ticket-head h4 {
+    font-size: 1rem;
+    color: var(--text-main);
+}
+
+.checkout-ticket-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.78);
+    color: #b45309;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+.checkout-ticket-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.checkout-ticket-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.4);
+}
+
+.checkout-ticket-item:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.checkout-ticket-item-main {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.checkout-ticket-item-main strong,
+.checkout-ticket-item > strong {
+    color: var(--text-main);
+}
+
+.checkout-ticket-item-main span {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.checkout-ticket-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(148, 163, 184, 0.24);
+    color: var(--text-main);
+}
+
+.checkout-ticket-total strong {
+    color: var(--primary-color);
+    font-size: 1.08rem;
+}
+
+.checkout-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.checkout-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.checkout-field span {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.checkout-field input,
+.checkout-field select,
+.checkout-field textarea {
+    width: 100%;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 12px;
+    background: #fff;
+    padding: 11px 12px;
+    color: var(--text-main);
+    font: inherit;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.checkout-field input:focus,
+.checkout-field select:focus,
+.checkout-field textarea:focus {
+    border-color: rgba(220, 38, 38, 0.35);
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.08);
+}
+
+.checkout-field-full {
+    grid-column: 1 / -1;
+}
+
+.checkout-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.checkout-secondary-btn {
+    appearance: none;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--text-main);
+    font-weight: 700;
+    padding: 14px 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    flex: 1;
+}
+
+.checkout-actions .cart-submit-btn {
+    flex: 1.4;
+}
+
+@media (max-width: 768px) {
+    .checkout-form {
+        grid-template-columns: 1fr;
+    }
+
+    .checkout-actions {
+        flex-direction: column;
+    }
+
+    .checkout-actions .cart-submit-btn,
+    .checkout-secondary-btn {
+        width: 100%;
     }
 }
 
