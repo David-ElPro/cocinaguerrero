@@ -16,6 +16,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const cartCountElement = document.getElementById("cart-count");
     const cartTotalDisplay = document.getElementById("cart-total-display");
     const sendCartWaBtn = document.getElementById("send-cart-wa");
+    const menuSearchInput = document.getElementById("menu-search");
+    const categoryFiltersContainer = document.getElementById("category-filters");
+    let allMenuItems = [];
+    let activeCategoryFilter = "all";
+    let activeSearchTerm = "";
 
     const urlParams = new URLSearchParams(window.location.search);
     let clientSlug = urlParams.get("c");
@@ -193,6 +198,115 @@ document.addEventListener("DOMContentLoaded", async () => {
         return icons[category] || "fa-solid fa-utensils";
     };
 
+    const matchesMenuSearch = (item, term) => {
+        if (!term) return true;
+        const haystack = `${item.nombre} ${item.descripcion} ${getCategoryLabel(item.categoria)}`.toLowerCase();
+        return haystack.includes(term.toLowerCase());
+    };
+
+    const renderCategoryFilters = () => {
+        if (!categoryFiltersContainer) return;
+
+        const filters = [
+            { id: "all", label: "Todos", icon: "fa-solid fa-bowl-food" },
+            ...CATEGORY_ORDER.map((category) => ({
+                id: category,
+                label: getCategoryLabel(category),
+                icon: getCategoryIcon(category)
+            }))
+        ];
+
+        categoryFiltersContainer.innerHTML = filters.map((filter) => `
+            <button
+                type="button"
+                class="category-filter ${activeCategoryFilter === filter.id ? "active" : ""}"
+                data-category-filter="${filter.id}"
+                aria-pressed="${activeCategoryFilter === filter.id}"
+            >
+                <i class="${filter.icon}"></i>
+                <span>${filter.label}</span>
+            </button>
+        `).join("");
+
+        categoryFiltersContainer.querySelectorAll(".category-filter").forEach((button) => {
+            button.addEventListener("click", () => {
+                activeCategoryFilter = button.dataset.categoryFilter;
+                renderCategoryFilters();
+                renderMenuWithFilters();
+            });
+        });
+    };
+
+    const renderMenuWithFilters = () => {
+        const catalogContainer = document.getElementById("catalog-container");
+        if (!catalogContainer) return;
+
+        const filteredItems = allMenuItems.filter((item) => {
+            const matchesCategory = activeCategoryFilter === "all" || item.categoria === activeCategoryFilter;
+            return matchesCategory && matchesMenuSearch(item, activeSearchTerm);
+        });
+
+        const groupedItems = filteredItems.reduce((accumulator, item) => {
+            if (!accumulator[item.categoria]) {
+                accumulator[item.categoria] = [];
+            }
+            accumulator[item.categoria].push(item);
+            return accumulator;
+        }, {});
+
+        const orderedCategories = [...new Set([
+            ...CATEGORY_ORDER.filter((category) => groupedItems[category]),
+            ...Object.keys(groupedItems).filter((category) => !CATEGORY_ORDER.includes(category))
+        ])];
+
+        if (!filteredItems.length) {
+            catalogContainer.innerHTML = `
+                <div class="empty-cart">
+                    <div>
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <p>No encontramos coincidencias para "${activeSearchTerm || "tu búsqueda"}".</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        catalogContainer.innerHTML = orderedCategories.map((category) => `
+            <section class="menu-category-section">
+                <div class="category-header">
+                    <h3 class="category-title"><i class="${getCategoryIcon(category)}"></i> ${getCategoryLabel(category)}</h3>
+                </div>
+                <div class="cards-grid">
+                    ${groupedItems[category].map((item) => `
+                        <div class="food-card">
+                            <div>
+                                <div class="card-img-wrapper">
+                                    <img src="${item.imagen}" alt="${item.nombre}" loading="lazy" decoding="async" fetchpriority="low">
+                                </div>
+                                <div class="card-body">
+                                    <h4 class="card-title">${item.nombre}</h4>
+                                    <p class="card-desc">${item.descripcion}</p>
+                                </div>
+                            </div>
+                            <div class="card-body" style="padding-top:0;">
+                                <div class="card-footer">
+                                    <span class="card-price">$${item.precio.toFixed(2).replace(/\.00$/, "")}</span>
+                                    <div class="qty-control" data-item-id="${item.id}">
+                                        <button class="qty-btn" type="button" data-action="decrease" data-item-id="${item.id}" data-item-name="${item.nombre}" data-item-price="${item.precio}" data-item-img="${item.imagen}" aria-label="Restar ${item.nombre}">−</button>
+                                        <input class="qty-input" type="number" min="0" step="1" value="0" data-item-id="${item.id}" data-item-name="${item.nombre}" data-item-price="${item.precio}" data-item-img="${item.imagen}" aria-label="Cantidad de ${item.nombre}">
+                                        <button class="qty-btn" type="button" data-action="increase" data-item-id="${item.id}" data-item-name="${item.nombre}" data-item-price="${item.precio}" data-item-img="${item.imagen}" aria-label="Sumar ${item.nombre}">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join("")}
+                </div>
+            </section>
+        `).join("");
+
+        refreshQuantityDisplays();
+    };
+
     let productHandlersBound = false;
     let cartHandlersBound = false;
 
@@ -206,7 +320,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             const csvText = await response.text();
             const records = parseCsv(csvText);
-            const validItems = records
+            allMenuItems = records
                 .filter((item) => item.nombre && item.precio)
                 .map((item) => ({
                     id: slugify(`${item.categoria || "a-la-carta"}-${item.nombre}`),
@@ -217,57 +331,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                     categoria: normalizeCategory(item.categoria)
                 }));
 
-            if (!validItems.length) {
+            if (!allMenuItems.length) {
                 catalogContainer.innerHTML = '<div class="empty-cart"><div><i class="fa-solid fa-bowl-food"></i><p>No hay productos disponibles en este momento.</p></div></div>';
                 return;
             }
 
-            const groupedItems = validItems.reduce((accumulator, item) => {
-                if (!accumulator[item.categoria]) {
-                    accumulator[item.categoria] = [];
-                }
-                accumulator[item.categoria].push(item);
-                return accumulator;
-            }, {});
-
-            const orderedCategories = [...new Set([...CATEGORY_ORDER.filter((category) => groupedItems[category]), ...Object.keys(groupedItems).filter((category) => !CATEGORY_ORDER.includes(category))])];
-
-            catalogContainer.innerHTML = orderedCategories.map((category) => `
-                <section class="menu-category-section">
-                    <div class="category-header">
-                        <h3 class="category-title"><i class="${getCategoryIcon(category)}"></i> ${getCategoryLabel(category)}</h3>
-                    </div>
-                    <div class="cards-grid">
-                        ${groupedItems[category].map((item) => `
-                            <div class="food-card">
-                                <div>
-                                    <div class="card-img-wrapper">
-                                        <img src="${item.imagen}" alt="${item.nombre}" loading="lazy">
-                                    </div>
-                                    <div class="card-body">
-                                        <h4 class="card-title">${item.nombre}</h4>
-                                        <p class="card-desc">${item.descripcion}</p>
-                                    </div>
-                                </div>
-                                <div class="card-body" style="padding-top:0;">
-                                    <div class="card-footer">
-                                        <span class="card-price">$${item.precio.toFixed(2).replace(/\.00$/, "")}</span>
-                                        <div class="qty-control" data-item-id="${item.id}">
-                                            <button class="qty-btn" type="button" data-action="decrease" data-item-id="${item.id}" data-item-name="${item.nombre}" data-item-price="${item.precio}" data-item-img="${item.imagen}" aria-label="Restar ${item.nombre}">−</button>
-                                            <input class="qty-input" type="number" min="0" step="1" value="0" data-item-id="${item.id}" data-item-name="${item.nombre}" data-item-price="${item.precio}" data-item-img="${item.imagen}" aria-label="Cantidad de ${item.nombre}">
-                                            <button class="qty-btn" type="button" data-action="increase" data-item-id="${item.id}" data-item-name="${item.nombre}" data-item-price="${item.precio}" data-item-img="${item.imagen}" aria-label="Sumar ${item.nombre}">+</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join("")}
-                    </div>
-                </section>
-            `).join("");
-
+            renderCategoryFilters();
+            renderMenuWithFilters();
             bindProductButtons();
             bindCartButtons();
-            refreshQuantityDisplays();
         } catch (error) {
             console.error("Error cargando menú desde CSV:", error);
             catalogContainer.innerHTML = '<div class="empty-cart"><div><i class="fa-solid fa-circle-exclamation"></i><p>No se pudo cargar el menú.</p></div></div>';
@@ -467,7 +539,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         cartItemsList.innerHTML = cart.map((item) => `
             <div class="cart-item-row">
-                <div class="cart-item-thumb"><img src="${item.imagen || './img/logo.png'}" alt="${item.nombre}" loading="lazy"></div>
+                <div class="cart-item-thumb"><img src="${item.imagen || './img/logo.png'}" alt="${item.nombre}" loading="lazy" decoding="async" fetchpriority="low"></div>
                 <div class="cart-item-info">
                     <span class="cart-item-name">${item.nombre}</span>
                     <span class="cart-item-price">${formatCurrency(item.precio)} c/u</span>
@@ -488,6 +560,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         syncCartTotals();
     };
+
+    if (menuSearchInput) {
+        menuSearchInput.addEventListener("input", (event) => {
+            activeSearchTerm = event.target.value.trim();
+            renderMenuWithFilters();
+        });
+    }
 
     const buildWhatsAppOrder = (waNumber, cart) => {
         if (!cart.length) return "";
@@ -514,7 +593,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         const setSeoMeta = (restaurantData) => {
             const restaurantName = restaurantData.nombre || "Cocina Guerrero";
             const description = restaurantData.eslogan || "Menú digital con pedidos por WhatsApp.";
-            const siteUrl = window.location.href.split("#")[0];
+            const siteUrl = "https://cocinaguerrero.web.app/";
+            const logoUrl = "https://cocinaguerrero.web.app/img/logo.png";
             const phone = normalizePhone(restaurantData.whatsapp || "521234567890");
 
             const metaMap = {
@@ -523,8 +603,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 "og:description": description,
                 "og:url": siteUrl,
                 "og:site_name": restaurantName,
+                "og:image": logoUrl,
                 "twitter:title": `${restaurantName} | Menú Digital`,
-                "twitter:description": description
+                "twitter:description": description,
+                "twitter:image": logoUrl
             };
 
             Object.entries(metaMap).forEach(([key, value]) => {
@@ -661,7 +743,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <p>"${t.texto}"</p>
                 <span>- ${t.nombre}</span>
                 <div class="testi-avatar">
-                    ${t.imagen ? `<img src="${t.imagen}" alt="${t.nombre}" loading="lazy">` : `<i class="fa-solid fa-circle-user"></i>`}
+                    ${t.imagen ? `<img src="${t.imagen}" alt="${t.nombre}" loading="lazy" decoding="async" fetchpriority="low">` : `<i class="fa-solid fa-circle-user"></i>`}
                 </div>
             </div>
         `).join("");

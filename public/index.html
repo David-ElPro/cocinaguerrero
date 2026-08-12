@@ -16,14 +16,16 @@
     <meta name="description" content="Cocina Guerrero | Menú digital con comida casera, bebidas, postres, especiales y pedidos por WhatsApp.">
     <meta property="og:title" content="Cocina Guerrero | Menú Digital">
     <meta property="og:description" content="Descubre el menú de Cocina Guerrero: platos, bebidas, postres, del comal y especiales con pedido rápido por WhatsApp.">
-    <meta property="og:image" content="img/logo.png">
+    <meta property="og:image" content="https://cocinaguerrero.web.app/img/logo.png">
     <meta property="og:url" content="https://cocinaguerrero.web.app/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Cocina Guerrero">
+    <meta property="og:image:alt" content="Logo de Cocina Guerrero">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Cocina Guerrero | Menú Digital">
     <meta name="twitter:description" content="Menú digital de Cocina Guerrero con pedidos por WhatsApp.">
-    <meta name="twitter:image" content="img/logo.png">
+    <meta name="twitter:image" content="https://cocinaguerrero.web.app/img/logo.png">
+    <link rel="canonical" href="https://cocinaguerrero.web.app/">
     <script type="application/ld+json">
         {
           "@context": "https://schema.org",
@@ -111,6 +113,13 @@
 
     <!-- Catálogo de Productos -->
     <main class="container" id="menu-section">
+        <div class="menu-toolbar">
+            <div class="menu-search-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input id="menu-search" type="search" placeholder="Busca tu platillo favorito..." aria-label="Buscar productos del menú">
+            </div>
+            <div id="category-filters" class="category-filters" aria-label="Filtrar por categoría"></div>
+        </div>
         <div id="catalog-container"></div>
     </main>
 
