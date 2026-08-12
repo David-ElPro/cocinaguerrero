@@ -56,6 +56,37 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const saveCart = (cart) => localStorage.setItem(CART_KEY, JSON.stringify(cart));
 
+    const setCartQuantity = (itemId, nextQty) => {
+        const cart = getCart();
+        const itemIndex = cart.findIndex((item) => item.id === itemId);
+
+        if (itemIndex === -1 && Number(nextQty) > 0) {
+            return;
+        }
+
+        if (itemIndex === -1) {
+            return;
+        }
+
+        const nextValue = Math.max(0, Number(nextQty) || 0);
+        if (nextValue <= 0) {
+            cart.splice(itemIndex, 1);
+        } else {
+            cart[itemIndex].cantidad = nextValue;
+        }
+
+        saveCart(cart);
+        refreshQuantityDisplays();
+        renderCartModal();
+    };
+
+    const removeItemFromCart = (itemId) => {
+        const cart = getCart().filter((item) => item.id !== itemId);
+        saveCart(cart);
+        refreshQuantityDisplays();
+        renderCartModal();
+    };
+
     const parseCsv = (csvText) => {
         const rows = [];
         let current = "";
@@ -148,6 +179,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         return labels[category] || category.replace(/-/g, " ");
     };
 
+    let productHandlersBound = false;
+    let cartHandlersBound = false;
+
     const renderMenuFromCsv = async () => {
         const catalogContainer = document.getElementById("catalog-container");
         if (!catalogContainer) return;
@@ -206,7 +240,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                                         <span class="card-price">$${item.precio.toFixed(2).replace(/\.00$/, "")}</span>
                                         <div class="qty-control" data-item-id="${item.id}">
                                             <button class="qty-btn" type="button" data-action="decrease" data-item-id="${item.id}" data-item-name="${item.nombre}" data-item-price="${item.precio}" data-item-img="${item.imagen}" aria-label="Restar ${item.nombre}">−</button>
-                                            <span class="qty-value">0</span>
+                                            <input class="qty-input" type="number" min="0" step="1" value="0" data-item-id="${item.id}" data-item-name="${item.nombre}" data-item-price="${item.precio}" data-item-img="${item.imagen}" aria-label="Cantidad de ${item.nombre}">
                                             <button class="qty-btn" type="button" data-action="increase" data-item-id="${item.id}" data-item-name="${item.nombre}" data-item-price="${item.precio}" data-item-img="${item.imagen}" aria-label="Sumar ${item.nombre}">+</button>
                                         </div>
                                     </div>
@@ -218,6 +252,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             `).join("");
 
             bindProductButtons();
+            bindCartButtons();
             refreshQuantityDisplays();
         } catch (error) {
             console.error("Error cargando menú desde CSV:", error);
@@ -253,27 +288,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.querySelectorAll(".qty-control").forEach((control) => {
             const productId = control.dataset.itemId;
             const currentQty = cartMap.get(productId)?.cantidad || 0;
-            const valueDisplay = control.querySelector(".qty-value");
+            const qtyInput = control.querySelector(".qty-input");
 
-            if (valueDisplay) {
-                valueDisplay.textContent = String(currentQty);
+            if (qtyInput) {
+                qtyInput.value = String(currentQty);
             }
 
             control.classList.toggle("filled", currentQty > 0);
-        });
-    };
-
-    const bindProductButtons = () => {
-        document.querySelectorAll(".qty-btn").forEach((button) => {
-            button.onclick = null;
-            button.addEventListener("click", () => {
-                const productId = button.dataset.itemId;
-                const itemName = button.dataset.itemName;
-                const itemPrice = Number(button.dataset.itemPrice || 0);
-                const itemImg = button.dataset.itemImg || "";
-                const delta = button.dataset.action === "increase" ? 1 : -1;
-                updateItemInCart({ id: productId, nombre: itemName, precio: itemPrice, imagen: itemImg }, delta);
-            });
         });
     };
 
@@ -286,58 +307,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         cartTotalDisplay.textContent = formatCurrency(totalPrice);
         cartTotalElement.textContent = formatCurrency(totalPrice);
         sendCartWaBtn.disabled = totalItems === 0;
-    };
-
-    const bindCartButtons = () => {
-        const cartButtons = document.querySelectorAll(".mini-qty-btn");
-        cartButtons.forEach((button) => {
-            button.onclick = null;
-            button.addEventListener("click", () => {
-                const productId = button.dataset.itemId;
-                const cartItem = getCart().find((item) => item.id === productId);
-                if (!cartItem) return;
-
-                const delta = button.dataset.action === "increase" ? 1 : -1;
-                updateItemInCart({ id: cartItem.id, nombre: cartItem.nombre, precio: cartItem.precio }, delta);
-            });
-        });
-    };
-
-    const renderCartModal = () => {
-        const cart = getCart();
-
-        if (!cart.length) {
-            cartItemsList.innerHTML = `
-                <div class="empty-cart">
-                    <div>
-                        <i class="fa-solid fa-bag-shopping"></i>
-                        <p>Tu carrito está vacío.</p>
-                    </div>
-                </div>
-            `;
-            syncCartTotals();
-            bindCartButtons();
-            return;
-        }
-
-        cartItemsList.innerHTML = cart.map((item) => `
-            <div class="cart-item-row">
-                <div class="cart-item-thumb"><img src="${item.imagen || './img/logo.png'}" alt="${item.nombre}" loading="lazy"></div>
-                <div>
-                    <span class="cart-item-name">${item.nombre}</span>
-                    <span class="cart-item-price">${formatCurrency(item.precio)} c/u</span>
-                </div>
-                <div class="cart-item-controls">
-                    <button class="mini-qty-btn" type="button" data-action="decrease" data-item-id="${item.id}" aria-label="Restar ${item.nombre}">−</button>
-                    <span>${item.cantidad}</span>
-                    <button class="mini-qty-btn" type="button" data-action="increase" data-item-id="${item.id}" aria-label="Sumar ${item.nombre}">+</button>
-                </div>
-                <strong>${formatCurrency(item.precio * item.cantidad)}</strong>
-            </div>
-        `).join("");
-
-        syncCartTotals();
-        bindCartButtons();
     };
 
     const updateItemInCart = (itemMeta, delta) => {
@@ -357,13 +326,153 @@ document.addEventListener("DOMContentLoaded", async () => {
                 nombre: itemMeta.nombre,
                 precio: itemMeta.precio,
                 cantidad: 1,
-                imagen: itemMeta.imagen || itemMeta.imagen || itemMeta.img || ""
+                imagen: itemMeta.imagen || itemMeta.img || ""
             });
         }
 
         saveCart(cart);
         refreshQuantityDisplays();
         renderCartModal();
+    };
+
+    const setItemQuantityDirect = (itemMeta, nextQty) => {
+        const cart = getCart();
+        const itemIndex = cart.findIndex((item) => item.id === itemMeta.id);
+        const safeQty = Math.max(0, Number(nextQty) || 0);
+
+        if (itemIndex >= 0) {
+            if (safeQty <= 0) {
+                cart.splice(itemIndex, 1);
+            } else {
+                cart[itemIndex].cantidad = safeQty;
+            }
+        } else if (safeQty > 0) {
+            cart.push({
+                id: itemMeta.id,
+                nombre: itemMeta.nombre,
+                precio: itemMeta.precio,
+                cantidad: safeQty,
+                imagen: itemMeta.imagen || itemMeta.img || ""
+            });
+        }
+
+        saveCart(cart);
+        refreshQuantityDisplays();
+        renderCartModal();
+    };
+
+    const bindProductButtons = () => {
+        if (productHandlersBound) return;
+        productHandlersBound = true;
+
+        document.addEventListener("click", (event) => {
+            const button = event.target.closest(".qty-btn");
+            if (!button) return;
+
+            const productId = button.dataset.itemId;
+            const itemName = button.dataset.itemName;
+            const itemPrice = Number(button.dataset.itemPrice || 0);
+            const itemImg = button.dataset.itemImg || "";
+            const delta = button.dataset.action === "increase" ? 1 : -1;
+            updateItemInCart({ id: productId, nombre: itemName, precio: itemPrice, imagen: itemImg }, delta);
+        });
+
+        document.addEventListener("change", (event) => {
+            const input = event.target.closest(".qty-input");
+            if (!input) return;
+
+            const productId = input.dataset.itemId;
+            const itemInCart = getCart().find((item) => item.id === productId);
+            const nextQty = Math.max(0, Number(input.value) || 0);
+
+            if (itemInCart || nextQty > 0) {
+                const itemMeta = {
+                    id: productId,
+                    nombre: input.dataset.itemName || itemInCart?.nombre || "Producto",
+                    precio: Number(input.dataset.itemPrice || itemInCart?.precio || 0),
+                    imagen: input.dataset.itemImg || itemInCart?.imagen || ""
+                };
+                setItemQuantityDirect(itemMeta, nextQty);
+            }
+        });
+    };
+
+    const bindCartButtons = () => {
+        if (cartHandlersBound) return;
+        cartHandlersBound = true;
+
+        document.addEventListener("click", (event) => {
+            const button = event.target.closest(".mini-qty-btn");
+            if (!button) return;
+
+            const productId = button.dataset.itemId;
+            const cartItem = getCart().find((item) => item.id === productId);
+            if (!cartItem) return;
+
+            const delta = button.dataset.action === "increase" ? 1 : -1;
+            updateItemInCart({ id: cartItem.id, nombre: cartItem.nombre, precio: cartItem.precio, imagen: cartItem.imagen }, delta);
+        });
+
+        document.addEventListener("click", (event) => {
+            const button = event.target.closest(".cart-remove-btn");
+            if (!button) return;
+            removeItemFromCart(button.dataset.itemId);
+        });
+
+        document.addEventListener("change", (event) => {
+            const input = event.target.closest(".cart-qty-input");
+            if (!input) return;
+
+            const cartItem = getCart().find((item) => item.id === input.dataset.itemId);
+            if (!cartItem) return;
+
+            setItemQuantityDirect({
+                id: cartItem.id,
+                nombre: cartItem.nombre,
+                precio: cartItem.precio,
+                imagen: cartItem.imagen
+            }, Number(input.value) || 0);
+        });
+    };
+
+    const renderCartModal = () => {
+        const cart = getCart();
+
+        if (!cart.length) {
+            cartItemsList.innerHTML = `
+                <div class="empty-cart">
+                    <div>
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <p>Tu carrito está vacío.</p>
+                    </div>
+                </div>
+            `;
+            syncCartTotals();
+            return;
+        }
+
+        cartItemsList.innerHTML = cart.map((item) => `
+            <div class="cart-item-row">
+                <div class="cart-item-thumb"><img src="${item.imagen || './img/logo.png'}" alt="${item.nombre}" loading="lazy"></div>
+                <div class="cart-item-info">
+                    <span class="cart-item-name">${item.nombre}</span>
+                    <span class="cart-item-price">${formatCurrency(item.precio)} c/u</span>
+                </div>
+                <div class="cart-item-controls">
+                    <button class="mini-qty-btn" type="button" data-action="decrease" data-item-id="${item.id}" aria-label="Restar ${item.nombre}">−</button>
+                    <input class="cart-qty-input" type="number" min="0" step="1" value="${item.cantidad}" data-item-id="${item.id}" aria-label="Cantidad de ${item.nombre}">
+                    <button class="mini-qty-btn" type="button" data-action="increase" data-item-id="${item.id}" aria-label="Sumar ${item.nombre}">+</button>
+                </div>
+                <div class="cart-item-actions">
+                    <strong>${formatCurrency(item.precio * item.cantidad)}</strong>
+                    <button class="cart-remove-btn" type="button" data-item-id="${item.id}" aria-label="Eliminar ${item.nombre}">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join("");
+
+        syncCartTotals();
     };
 
     const buildWhatsAppOrder = (waNumber, cart) => {

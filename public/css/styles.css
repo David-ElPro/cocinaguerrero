@@ -459,16 +459,40 @@ height: 34px;
 border-radius: 8px;
 }
 
+.qty-input,
+.cart-qty-input {
+width: 52px;
+min-width: 52px;
+height: 32px;
+border: 1px solid var(--border-color);
+background: #ffffff;
+border-radius: 8px;
+text-align: center;
+font-size: 0.95rem;
+font-weight: 700;
+color: var(--text-main);
+outline: none;
+-moz-appearance: textfield;
+}
+
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button,
+.cart-qty-input::-webkit-outer-spin-button,
+.cart-qty-input::-webkit-inner-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+
 /* En pantallas pequeñas, volvemos a flujo normal y centramos con margin auto */
 @media (max-width: 768px) {
 .card-footer {
-    position: static;
+position: static;
 }
 .card-footer .qty-control {
-    position: static;
-    transform: none;
-    margin: 8px auto 0;
-    display: inline-flex;
+position: static;
+transform: none;
+margin: 8px auto 0;
+display: inline-flex;
 }
 }
 
@@ -1309,6 +1333,10 @@ footer {
     padding: 12px 14px;
 }
 
+.cart-item-info {
+    min-width: 0;
+}
+
 .cart-item-thumb img {
     width: 56px;
     height: 56px;
@@ -1350,6 +1378,12 @@ footer {
     padding: 4px 6px;
 }
 
+.cart-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .mini-qty-btn,
 .qty-btn {
     border: none;
@@ -1370,6 +1404,24 @@ footer {
 .mini-qty-btn:active,
 .qty-btn:active { transform: scale(0.96); }
 
+.cart-remove-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 9px;
+    background: #fee2e2;
+    color: var(--primary-color);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.cart-remove-btn:active {
+    transform: scale(0.96);
+}
+
 .qty-control {
     display: inline-flex;
     align-items: center;
@@ -1384,13 +1436,6 @@ footer {
 .qty-control.filled {
     border-color: rgba(220, 38, 38, 0.2);
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08);
-}
-
-.qty-value {
-    min-width: 22px;
-    text-align: center;
-    font-weight: 800;
-    color: var(--text-main);
 }
 
 .cart-footer-summary {
