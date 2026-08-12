@@ -1,0 +1,24 @@
+{
+  "name": "cocinaguerrero",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/David-ElPro/cocinaguerrero.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/David-ElPro/cocinaguerrero/issues"
+  },
+  "homepage": "https://github.com/David-ElPro/cocinaguerrero#readme",
+  "devDependencies": {
+    "playwright": "^1.62.1"
+  }
+}

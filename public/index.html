@@ -215,6 +215,42 @@
             <i class="fa-brands fa-whatsapp"></i>
         </a>
     </div>
+</div>
+
+    <div class="cart-summary-bar" id="cart-summary-bar">
+        <div class="cart-summary-meta">
+            <span class="cart-summary-count" id="cart-count">0</span>
+            <div class="cart-summary-text">
+                <strong id="cart-total-display">$0</strong>
+                <span>Total</span>
+            </div>
+        </div>
+        <button id="open-cart-btn" class="cart-summary-btn" type="button">
+            <i class="fa-solid fa-bag-shopping"></i> Ver carrito
+        </button>
+    </div>
+
+    <div class="cart-modal-backdrop" id="cart-modal" aria-hidden="true">
+        <div class="cart-modal" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+            <div class="cart-modal-header">
+                <div>
+                    <p class="cart-modal-kicker">Tu pedido</p>
+                    <h3 id="cart-title">Ver carrito</h3>
+                </div>
+                <button id="close-cart-btn" class="close-cart-btn" type="button" aria-label="Cerrar carrito">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="cart-items-list" class="cart-items-list"></div>
+            <div class="cart-footer-summary">
+                <span>Total general</span>
+                <strong id="cart-total">$0</strong>
+            </div>
+            <button id="send-cart-wa" class="cart-submit-btn" type="button">
+                <i class="fa-brands fa-whatsapp"></i> Enviar pedido por WhatsApp
+            </button>
+        </div>
+    </div>
 
 <script src="js/app.js"></script>
 </body>

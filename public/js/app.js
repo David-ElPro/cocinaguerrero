@@ -1,4 +1,22 @@
 document.addEventListener("DOMContentLoaded", async () => {
+    const CART_KEY = "cocinaGuerreroCart";
+    const GOOGLE_MENU_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQMVaeGU8sp81WXnzULp9xNJG74w-sxgLi3sq-I_TBQmT5MrnlpcBQ3KJVW1BWhYQ9XYu2UvowYkBE3/pub?output=csv";
+    const CATEGORY_ORDER = [
+        "a-la-carta",
+        "platos",
+        "bebidas",
+        "postres",
+        "snacks",
+        "del-comal",
+        "especiales"
+    ];
+    const cartModal = document.getElementById("cart-modal");
+    const cartItemsList = document.getElementById("cart-items-list");
+    const cartTotalElement = document.getElementById("cart-total");
+    const cartCountElement = document.getElementById("cart-count");
+    const cartTotalDisplay = document.getElementById("cart-total-display");
+    const sendCartWaBtn = document.getElementById("send-cart-wa");
+
     const urlParams = new URLSearchParams(window.location.search);
     let clientSlug = urlParams.get("c");
 
@@ -10,13 +28,366 @@ document.addEventListener("DOMContentLoaded", async () => {
         clientSlug = (!last || last.toLowerCase() === "cocinaguerrero") ? "cocina-guerrero" : last;
     }
 
+    const formatCurrency = (value) => new Intl.NumberFormat("es-MX", {
+        style: "currency",
+        currency: "MXN",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(Number(value) || 0);
+
+    const parsePrice = (value) => {
+        const parsed = Number(String(value).replace(/[^\d.]/g, ""));
+        return Number.isFinite(parsed) ? parsed : 0;
+    };
+
+    const normalizePhone = (value) => {
+        const digits = String(value || "").replace(/\D/g, "");
+        return digits.startsWith("52") ? digits : `52${digits}`;
+    };
+
+    const getCart = () => {
+        try {
+            const saved = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
+            return Array.isArray(saved) ? saved : [];
+        } catch (error) {
+            return [];
+        }
+    };
+
+    const saveCart = (cart) => localStorage.setItem(CART_KEY, JSON.stringify(cart));
+
+    const parseCsv = (csvText) => {
+        const rows = [];
+        let current = "";
+        let row = [];
+        let inQuotes = false;
+
+        for (let i = 0; i < csvText.length; i += 1) {
+            const char = csvText[i];
+            const nextChar = csvText[i + 1];
+
+            if (char === '"') {
+                if (inQuotes && nextChar === '"') {
+                    current += '"';
+                    i += 1;
+                } else {
+                    inQuotes = !inQuotes;
+                }
+                continue;
+            }
+
+            if (char === "," && !inQuotes) {
+                row.push(current);
+                current = "";
+                continue;
+            }
+
+            if ((char === "\n" || char === "\r") && !inQuotes) {
+                if (char === "\r" && nextChar === "\n") {
+                    i += 1;
+                }
+                row.push(current);
+                if (row.some((cell) => String(cell).trim() !== "")) {
+                    rows.push(row);
+                }
+                row = [];
+                current = "";
+                continue;
+            }
+
+            current += char;
+        }
+
+        if (current.length > 0 || row.length > 0) {
+            row.push(current);
+            if (row.some((cell) => String(cell).trim() !== "")) {
+                rows.push(row);
+            }
+        }
+
+        if (!rows.length) return [];
+
+        const [headers, ...dataRows] = rows;
+        const normalizedHeaders = headers.map((header) => String(header).trim().toLowerCase());
+
+        return dataRows.map((values) => {
+            const record = {};
+            normalizedHeaders.forEach((header, index) => {
+                record[header] = (values[index] !== undefined) ? values[index].trim() : "";
+            });
+            return record;
+        }).filter((item) => item.nombre || item.precio || item.descripcion || item.imagen);
+    };
+
+    const normalizeCategory = (value) => {
+        const raw = String(value || "").trim().toLowerCase();
+        if (!raw) return "a-la-carta";
+
+        const normalized = raw
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9-]/g, "")
+            .replace(/-+/g, "-")
+            .replace(/^-|-$/g, "");
+
+        return CATEGORY_ORDER.includes(normalized) ? normalized : "a-la-carta";
+    };
+
+    const getCategoryLabel = (category) => {
+        const labels = {
+            "a-la-carta": "A la carta",
+            platos: "Platos",
+            bebidas: "Bebidas",
+            postres: "Postres",
+            snacks: "Snacks",
+            "del-comal": "Del comal",
+            especiales: "Especiales"
+        };
+
+        return labels[category] || category.replace(/-/g, " ");
+    };
+
+    const renderMenuFromCsv = async () => {
+        const catalogContainer = document.getElementById("catalog-container");
+        if (!catalogContainer) return;
+
+        try {
+            const response = await fetch(GOOGLE_MENU_CSV_URL, { cache: "no-store" });
+            if (!response.ok) throw new Error("No se pudo cargar el CSV del menú");
+
+            const csvText = await response.text();
+            const records = parseCsv(csvText);
+            const validItems = records
+                .filter((item) => item.nombre && item.precio)
+                .map((item) => ({
+                    id: slugify(`${item.categoria || "a-la-carta"}-${item.nombre}`),
+                    nombre: item.nombre,
+                    precio: Number.parseFloat(String(item.precio).replace(/[$,\s]/g, "")) || 0,
+                    descripcion: item.descripcion || "",
+                    imagen: item.imagen || "./img/logo.png",
+                    categoria: normalizeCategory(item.categoria)
+                }));
+
+            if (!validItems.length) {
+                catalogContainer.innerHTML = '<div class="empty-cart"><div><i class="fa-solid fa-bowl-food"></i><p>No hay productos disponibles en este momento.</p></div></div>';
+                return;
+            }
+
+            const groupedItems = validItems.reduce((accumulator, item) => {
+                if (!accumulator[item.categoria]) {
+                    accumulator[item.categoria] = [];
+                }
+                accumulator[item.categoria].push(item);
+                return accumulator;
+            }, {});
+
+            const orderedCategories = [...new Set([...CATEGORY_ORDER.filter((category) => groupedItems[category]), ...Object.keys(groupedItems).filter((category) => !CATEGORY_ORDER.includes(category))])];
+
+            catalogContainer.innerHTML = orderedCategories.map((category) => `
+                <section class="menu-category-section">
+                    <div class="category-header">
+                        <h3 class="category-title"><i class="fa-solid fa-utensils"></i> ${getCategoryLabel(category)}</h3>
+                    </div>
+                    <div class="cards-grid">
+                        ${groupedItems[category].map((item) => `
+                            <div class="food-card">
+                                <div>
+                                    <div class="card-img-wrapper">
+                                        <img src="${item.imagen}" alt="${item.nombre}" loading="lazy">
+                                    </div>
+                                    <div class="card-body">
+                                        <h4 class="card-title">${item.nombre}</h4>
+                                        <p class="card-desc">${item.descripcion}</p>
+                                    </div>
+                                </div>
+                                <div class="card-body" style="padding-top:0;">
+                                    <div class="card-footer">
+                                        <span class="card-price">$${item.precio.toFixed(2).replace(/\.00$/, "")}</span>
+                                        <div class="qty-control" data-item-id="${item.id}">
+                                            <button class="qty-btn" type="button" data-action="decrease" data-item-id="${item.id}" data-item-name="${item.nombre}" data-item-price="${item.precio}" data-item-img="${item.imagen}" aria-label="Restar ${item.nombre}">−</button>
+                                            <span class="qty-value">0</span>
+                                            <button class="qty-btn" type="button" data-action="increase" data-item-id="${item.id}" data-item-name="${item.nombre}" data-item-price="${item.precio}" data-item-img="${item.imagen}" aria-label="Sumar ${item.nombre}">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join("")}
+                    </div>
+                </section>
+            `).join("");
+
+            bindProductButtons();
+            refreshQuantityDisplays();
+        } catch (error) {
+            console.error("Error cargando menú desde CSV:", error);
+            catalogContainer.innerHTML = '<div class="empty-cart"><div><i class="fa-solid fa-circle-exclamation"></i><p>No se pudo cargar el menú.</p></div></div>';
+        }
+    };
+
+    const slugify = (value) => String(value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "item";
+
+    const openCart = () => {
+        if (!cartModal) return;
+        cartModal.classList.add("is-open");
+        cartModal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+    };
+
+    const closeCart = () => {
+        if (!cartModal) return;
+        cartModal.classList.remove("is-open");
+        cartModal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+    };
+
+    const refreshQuantityDisplays = () => {
+        const cart = getCart();
+        const cartMap = new Map(cart.map((item) => [item.id, item]));
+
+        document.querySelectorAll(".qty-control").forEach((control) => {
+            const productId = control.dataset.itemId;
+            const currentQty = cartMap.get(productId)?.cantidad || 0;
+            const valueDisplay = control.querySelector(".qty-value");
+
+            if (valueDisplay) {
+                valueDisplay.textContent = String(currentQty);
+            }
+
+            control.classList.toggle("filled", currentQty > 0);
+        });
+    };
+
+    const bindProductButtons = () => {
+        document.querySelectorAll(".qty-btn").forEach((button) => {
+            button.onclick = null;
+            button.addEventListener("click", () => {
+                const productId = button.dataset.itemId;
+                const itemName = button.dataset.itemName;
+                const itemPrice = Number(button.dataset.itemPrice || 0);
+                const itemImg = button.dataset.itemImg || "";
+                const delta = button.dataset.action === "increase" ? 1 : -1;
+                updateItemInCart({ id: productId, nombre: itemName, precio: itemPrice, imagen: itemImg }, delta);
+            });
+        });
+    };
+
+    const syncCartTotals = () => {
+        const cart = getCart();
+        const totalItems = cart.reduce((sum, item) => sum + Number(item.cantidad || 0), 0);
+        const totalPrice = cart.reduce((sum, item) => sum + (Number(item.precio || 0) * Number(item.cantidad || 0)), 0);
+
+        cartCountElement.textContent = String(totalItems);
+        cartTotalDisplay.textContent = formatCurrency(totalPrice);
+        cartTotalElement.textContent = formatCurrency(totalPrice);
+        sendCartWaBtn.disabled = totalItems === 0;
+    };
+
+    const bindCartButtons = () => {
+        const cartButtons = document.querySelectorAll(".mini-qty-btn");
+        cartButtons.forEach((button) => {
+            button.onclick = null;
+            button.addEventListener("click", () => {
+                const productId = button.dataset.itemId;
+                const cartItem = getCart().find((item) => item.id === productId);
+                if (!cartItem) return;
+
+                const delta = button.dataset.action === "increase" ? 1 : -1;
+                updateItemInCart({ id: cartItem.id, nombre: cartItem.nombre, precio: cartItem.precio }, delta);
+            });
+        });
+    };
+
+    const renderCartModal = () => {
+        const cart = getCart();
+
+        if (!cart.length) {
+            cartItemsList.innerHTML = `
+                <div class="empty-cart">
+                    <div>
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <p>Tu carrito está vacío.</p>
+                    </div>
+                </div>
+            `;
+            syncCartTotals();
+            bindCartButtons();
+            return;
+        }
+
+        cartItemsList.innerHTML = cart.map((item) => `
+            <div class="cart-item-row">
+                <div class="cart-item-thumb"><img src="${item.imagen || './img/logo.png'}" alt="${item.nombre}" loading="lazy"></div>
+                <div>
+                    <span class="cart-item-name">${item.nombre}</span>
+                    <span class="cart-item-price">${formatCurrency(item.precio)} c/u</span>
+                </div>
+                <div class="cart-item-controls">
+                    <button class="mini-qty-btn" type="button" data-action="decrease" data-item-id="${item.id}" aria-label="Restar ${item.nombre}">−</button>
+                    <span>${item.cantidad}</span>
+                    <button class="mini-qty-btn" type="button" data-action="increase" data-item-id="${item.id}" aria-label="Sumar ${item.nombre}">+</button>
+                </div>
+                <strong>${formatCurrency(item.precio * item.cantidad)}</strong>
+            </div>
+        `).join("");
+
+        syncCartTotals();
+        bindCartButtons();
+    };
+
+    const updateItemInCart = (itemMeta, delta) => {
+        const cart = getCart();
+        const itemIndex = cart.findIndex((item) => item.id === itemMeta.id);
+
+        if (itemIndex >= 0) {
+            const nextQty = Number(cart[itemIndex].cantidad || 0) + delta;
+            if (nextQty <= 0) {
+                cart.splice(itemIndex, 1);
+            } else {
+                cart[itemIndex].cantidad = nextQty;
+            }
+        } else if (delta > 0) {
+            cart.push({
+                id: itemMeta.id,
+                nombre: itemMeta.nombre,
+                precio: itemMeta.precio,
+                cantidad: 1,
+                imagen: itemMeta.imagen || itemMeta.imagen || itemMeta.img || ""
+            });
+        }
+
+        saveCart(cart);
+        refreshQuantityDisplays();
+        renderCartModal();
+    };
+
+    const buildWhatsAppOrder = (waNumber, cart) => {
+        if (!cart.length) return "";
+
+        const lines = [
+            "Hola Cocina Guerrero 👋",
+            "Quiero hacer este pedido:",
+            ...cart.map((item) => `- ${item.nombre} x${item.cantidad} = ${formatCurrency(item.precio * item.cantidad)}`),
+            "",
+            `Total: ${formatCurrency(cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0))}`,
+            "",
+            "Gracias."
+        ];
+
+        return `https://wa.me/${waNumber}?text=${encodeURIComponent(lines.join("\n"))}`;
+    };
+
     try {
         const response = await fetch(`./data/${clientSlug}.json`);
         if (!response.ok) throw new Error("Cliente no encontrado");
 
         const data = await response.json();
 
-        // 1. Inyección de Información Básica
         document.title = `${data.nombre} | Menú Digital`;
         document.getElementById("client-logo").src = data.logo;
         document.getElementById("client-title").textContent = data.nombre;
@@ -26,7 +397,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("client-schedule").innerHTML = `<i class="fa-solid fa-clock"></i> ${data.horario}`;
         document.getElementById("footer-address").innerHTML = `<i class="fa-solid fa-location-dot"></i> ${data.direccion}`;
 
-        // Teléfonos y Redes
         document.getElementById("tel-1").textContent = data.whatsapp;
         document.getElementById("tel-1").href = `tel:${data.whatsapp}`;
         document.getElementById("tel-2").textContent = data.telefonoSecundario;
@@ -45,8 +415,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.getElementById("social-tw").href = data.redes.twitter;
         }
 
-        // 2. Configurar Botones Principales de WhatsApp
-        const waPhone = data.whatsapp;
+        const waPhone = normalizePhone(data.whatsapp);
         const msgGeneral = encodeURIComponent("¡Hola Cocina Guerrero! Me gustaría hacer un pedido.");
         const msgGuisados = encodeURIComponent("¡Hola! Quisiera consultar los guisados del día de hoy.");
 
@@ -54,7 +423,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("btn-daily-wa").href = `https://wa.me/${waPhone}?text=${msgGuisados}`;
         document.getElementById("btn-wa-float").href = `https://wa.me/${waPhone}?text=${msgGeneral}`;
 
-        // 3. Hero Carousel Rotativo
         if (data.carousel && data.carousel.length > 0) {
             const carouselBg = document.getElementById("carousel-bg");
             let idx = 0;
@@ -65,53 +433,34 @@ document.addEventListener("DOMContentLoaded", async () => {
             }, 4000);
         }
 
-        // 4. Renderizar Catálogo de Platillos
-        const catalogContainer = document.getElementById("catalog-container");
-        catalogContainer.innerHTML = "";
+        await renderMenuFromCsv();
 
-        data.categorias.forEach((cat) => {
-            const section = document.createElement("section");
-
-            let itemsHTML = cat.items.map(item => {
-                const itemMsg = encodeURIComponent(`¡Hola Cocina Guerrero! Quisiera pedir una orden de: ${item.nombre}`);
-                const waItemUrl = `https://wa.me/${waPhone}?text=${itemMsg}`;
-
-                return `
-          <div class="food-card">
-            <div>
-              <div class="card-img-wrapper">
-                <img src="${item.imagen}" alt="${item.nombre}" loading="lazy">
-                ${item.badge ? `<span class="card-badge">${item.badge}</span>` : ""}
-              </div>
-              <div class="card-body">
-                <h4 class="card-title">${item.nombre}</h4>
-                <p class="card-desc">${item.descripcion}</p>
-              </div>
-            </div>
-            <div class="card-body" style="padding-top:0;">
-              <div class="card-footer">
-                <span class="card-price">${item.precio}</span>
-                <a href="${waItemUrl}" target="_blank" class="btn-card-wa">
-                  <i class="fa-brands fa-whatsapp"></i> Pedir ahora
-                </a>
-              </div>
-            </div>
-          </div>
-        `;
-            }).join('');
-
-            section.innerHTML = `
-        <div class="category-header">
-          <h3 class="category-title"><i class="fa-solid fa-utensils"></i> ${cat.titulo}</h3>
-          ${cat.nota ? `<p class="category-note">${cat.nota}</p>` : ""}
-        </div>
-        <div class="cards-grid">${itemsHTML}</div>
-      `;
-
-            catalogContainer.appendChild(section);
+        document.getElementById("open-cart-btn").addEventListener("click", () => {
+            renderCartModal();
+            openCart();
         });
 
-        // 5. Renderizar y Controlar Carrusel de Testimonios
+        document.getElementById("close-cart-btn").addEventListener("click", () => {
+            closeCart();
+        });
+
+        cartModal.addEventListener("click", (event) => {
+            if (event.target === cartModal) {
+                closeCart();
+            }
+        });
+
+        sendCartWaBtn.addEventListener("click", () => {
+            const cart = getCart();
+            const orderUrl = buildWhatsAppOrder(waPhone, cart);
+            if (orderUrl) {
+                window.open(orderUrl, "_blank");
+            }
+        });
+
+        refreshQuantityDisplays();
+        renderCartModal();
+
         const testimonialsData = [
             { nombre: "Karla M.", texto: "La milanesa y el agua del día están riquísimas. El servicio por WhatsApp es super rápido.", imagen: "./img/test1.webp" },
             { nombre: "María Fernanda G.", texto: "El pozole de los jueves es una joya. Sabor súper casero y las porciones muy bien servidas.", imagen: "./img/test2.jpg" },
@@ -122,18 +471,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         ];
 
         const testiTrack = document.getElementById("testi-track");
-        testiTrack.innerHTML = testimonialsData.map(t => `
-      <div class="testimonial-card">
-        <div class="testi-stars">
-          <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-        </div>
-        <p>"${t.texto}"</p>
-        <span>- ${t.nombre}</span>
-        <div class="testi-avatar">
-          ${t.imagen ? `<img src="${t.imagen}" alt="${t.nombre}" loading="lazy">` : `<i class="fa-solid fa-circle-user"></i>`}
-        </div>
-      </div>
-    `).join('');
+        testiTrack.innerHTML = testimonialsData.map((t) => `
+            <div class="testimonial-card">
+                <div class="testi-stars">
+                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                </div>
+                <p>"${t.texto}"</p>
+                <span>- ${t.nombre}</span>
+                <div class="testi-avatar">
+                    ${t.imagen ? `<img src="${t.imagen}" alt="${t.nombre}" loading="lazy">` : `<i class="fa-solid fa-circle-user"></i>`}
+                </div>
+            </div>
+        `).join("");
 
         let currentTesti = 0;
         const prevBtn = document.getElementById("prev-testi");
@@ -157,13 +506,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             updateTestiSlide();
         });
 
-        // Auto-play de testimonios cada 5 segundos
         setInterval(() => {
             currentTesti = (currentTesti + 1) % testimonialsData.length;
             updateTestiSlide();
         }, 5000);
 
-        // 6. Mobile Navbar Toggle & Click Outside to Close
         const navToggle = document.getElementById("nav-toggle");
         const navMenu = document.getElementById("nav-menu");
 
@@ -182,15 +529,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
 
-        // Cerrar menú al presionar un enlace
-        document.querySelectorAll(".nav-link").forEach(link => {
+        document.querySelectorAll(".nav-link").forEach((link) => {
             link.addEventListener("click", () => {
                 navMenu.classList.remove("active");
                 navToggle.classList.remove("active");
             });
         });
 
-        // 7. Tooltip de WhatsApp Flotante (Se oculta en 5 segundos)
         setTimeout(() => {
             const tooltip = document.getElementById("wa-tooltip");
             if (tooltip) {
@@ -199,12 +544,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 setTimeout(() => tooltip.remove(), 500);
             }
         }, 5000);
-        // 8. Botones Flotantes de Redes Sociales Desplegables
+
         const socialToggleBtn = document.getElementById("social-toggle-btn");
         const socialContainer = document.getElementById("social-floatings-container");
         let socialOpen = false;
 
-        // Sincronicar URLs de redes sociales
         if (data.redes) {
             document.getElementById("social-float-fb").href = data.redes.facebook || "#";
             document.getElementById("social-float-ig").href = data.redes.instagram || "#";
@@ -223,7 +567,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
 
-        // Cerrar al hacer click fuera
         document.addEventListener("click", (e) => {
             if (socialOpen && !socialContainer.contains(e.target) && !socialToggleBtn.contains(e.target)) {
                 socialOpen = false;
@@ -231,7 +574,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 socialToggleBtn.innerHTML = '<i class="fa-solid fa-share-nodes"></i>';
             }
         });
-        // Revelar App
+
         document.getElementById("app").style.display = "block";
 
     } catch (err) {
