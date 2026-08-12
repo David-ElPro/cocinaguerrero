@@ -296,9 +296,12 @@ body {
 
 .menu-search-wrap {
     position: relative;
+    display: flex;
+    align-items: center;
     flex: 1 1 300px;
     max-width: 420px;
     min-width: 220px;
+    min-height: 48px;
 }
 
 .menu-search-wrap i {
@@ -308,6 +311,9 @@ body {
     transform: translateY(-50%);
     color: var(--text-muted);
     font-size: 0.9rem;
+    line-height: 1;
+    z-index: 1;
+    pointer-events: none;
 }
 
 .menu-search-wrap input {
@@ -320,6 +326,7 @@ body {
     color: var(--text-main);
     outline: none;
     box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    height: 48px;
 }
 
 .menu-search-wrap input:focus {
@@ -400,12 +407,20 @@ body {
     .menu-search-wrap {
         max-width: none;
         width: 100%;
+        min-height: 48px;
+    }
+
+    .menu-search-wrap i {
+        left: 14px;
+        font-size: 0.85rem;
     }
 
     .menu-search-wrap input {
         width: 100%;
         min-height: 48px;
+        height: 48px;
         font-size: 0.95rem;
+        padding-left: 40px;
     }
 
     .category-filters {
